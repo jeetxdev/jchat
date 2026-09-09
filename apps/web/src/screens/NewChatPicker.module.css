@@ -1,0 +1,110 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px 10px;
+  flex: none;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 20px;
+  flex: 1;
+}
+
+.cancel {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.searchWrap {
+  padding: 6px 16px 12px;
+  flex: none;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0 16px;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.actionIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: var(--accent-tint);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.actionRow strong {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.sectionLabel {
+  padding: 14px 16px 4px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.contactRow:hover {
+  background: var(--surface-alt);
+}

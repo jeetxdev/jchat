@@ -1,0 +1,37 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+span.pill {
+  cursor: default;
+}
+
+.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.inactive {
+  background: var(--surface-alt);
+  color: var(--text-soft);
+}
+
+.tint {
+  background: var(--accent-tint);
+  color: var(--accent-text);
+}
+
+.neutral {
+  background: var(--border);
+  color: var(--text-soft);
+}

@@ -1,0 +1,39 @@
+.button {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: filter 0.15s ease, background 0.15s ease;
+}
+
+.button:hover {
+  filter: brightness(0.96);
+}
+
+.default {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.accent {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+.dark {
+  background: #1f2937;
+  color: #fff;
+}
+
+.danger {
+  background: var(--danger);
+  color: #fff;
+}
