@@ -1,8 +1,8 @@
-import { Search, Users, UserPlus } from 'lucide-react';
-import type { Contact } from '@jchat/shared';
-import Avatar from '../components/primitives/Avatar';
-import SectionLabel from '../components/primitives/SectionLabel';
-import styles from './NewChatPicker.module.css';
+import { Search, Users, UserPlus } from "lucide-react";
+import type { Contact } from "@jchat/shared";
+import Avatar from "../components/primitives/Avatar";
+import SectionLabel from "../components/primitives/SectionLabel";
+import styles from "./NewChatPicker.module.css";
 
 interface NewChatPickerProps {
   contacts: Contact[];
@@ -46,7 +46,12 @@ export default function NewChatPicker({ contacts, onCancel, onSelectContact }: N
         </div>
 
         {contacts.map((contact) => (
-          <button key={contact.id} type="button" className={styles.contactRow} onClick={() => onSelectContact(contact.id)}>
+          <button
+            key={contact.id}
+            type="button"
+            className={styles.contactRow}
+            onClick={() => onSelectContact(contact.id)}
+          >
             <Avatar initials={contact.initials} color={contact.color} size={40} />
             <span>{contact.name}</span>
           </button>

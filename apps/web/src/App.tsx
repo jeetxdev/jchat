@@ -1,10 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  MessageCircle,
-  Clock,
-  Phone as PhoneIcon,
-  Settings as SettingsIcon,
-} from "lucide-react";
+import { MessageCircle, Clock, Phone as PhoneIcon, Settings as SettingsIcon } from "lucide-react";
 import { chats, contacts, getChat, getContact } from "./data/mockData";
 import { useMediaQuery } from "./hooks/useMediaQuery";
 import TabBar, { type Tab } from "./components/primitives/TabBar";
@@ -30,8 +25,7 @@ export default function App() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [detailPanel, setDetailPanel] = useState<DetailPanel>("none");
   const [showNewChat, setShowNewChat] = useState(false);
-  const [settingsSection, setSettingsSection] =
-    useState<SettingsSection>("root");
+  const [settingsSection, setSettingsSection] = useState<SettingsSection>("root");
   const [activeCallChatId, setActiveCallChatId] = useState<string | null>(null);
   const [readReceipts, setReadReceipts] = useState(true);
 
@@ -113,9 +107,7 @@ export default function App() {
           variant="sidebar"
           activeSection={settingsSection === "privacy" ? "privacy" : null}
           darkMode={theme === "dark"}
-          onToggleDarkMode={() =>
-            setTheme((t) => (t === "dark" ? "light" : "dark"))
-          }
+          onToggleDarkMode={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
           onOpenPrivacy={() => setSettingsSection("privacy")}
         />
       );
@@ -133,9 +125,7 @@ export default function App() {
                 <PhoneIcon size={40} strokeWidth={1.5} />
               )
             }
-            title={
-              activeTab === "status" ? "No status updates" : "No recent calls"
-            }
+            title={activeTab === "status" ? "No status updates" : "No recent calls"}
           />
         </div>
       );
@@ -154,11 +144,7 @@ export default function App() {
         center = (
           <Conversation
             chat={selectedChat}
-            contact={
-              selectedChat.contactId
-                ? getContact(selectedChat.contactId)
-                : undefined
-            }
+            contact={selectedChat.contactId ? getContact(selectedChat.contactId) : undefined}
             showBack={false}
             onBack={() => setSelectedChatId(null)}
             onOpenInfo={handleOpenInfo}
@@ -198,26 +184,17 @@ export default function App() {
               <PhoneIcon size={64} strokeWidth={1.5} />
             )
           }
-          title={
-            activeTab === "status"
-              ? "Status updates from your contacts"
-              : "Your recent calls"
-          }
+          title={activeTab === "status" ? "Status updates from your contacts" : "Your recent calls"}
         />
       );
     }
 
-    const showRightPanel =
-      activeTab === "chats" && !!selectedChat && detailPanel !== "none";
+    const showRightPanel = activeTab === "chats" && !!selectedChat && detailPanel !== "none";
 
     return (
       <div className={styles.app}>
         <div className={styles.desktopFrame}>
-          <TabBar
-            active={activeTab}
-            onChange={handleTabChange}
-            orientation="vertical"
-          />
+          <TabBar active={activeTab} onChange={handleTabChange} orientation="vertical" />
           <div className={styles.sidebarPane}>{sidebar}</div>
           <div className={styles.centerPane}>{center}</div>
           {showRightPanel && selectedChat && (
@@ -278,9 +255,7 @@ export default function App() {
     mobileScreen = (
       <GroupInfo
         chat={selectedChat}
-        members={(selectedChat.memberIds ?? [])
-          .map((id) => getContact(id)!)
-          .filter(Boolean)}
+        members={(selectedChat.memberIds ?? []).map((id) => getContact(id)!).filter(Boolean)}
         variant="mobile"
         onBack={() => setDetailPanel("none")}
       />
@@ -301,9 +276,7 @@ export default function App() {
         variant="mobile"
         activeSection={null}
         darkMode={theme === "dark"}
-        onToggleDarkMode={() =>
-          setTheme((t) => (t === "dark" ? "light" : "dark"))
-        }
+        onToggleDarkMode={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
         onOpenPrivacy={() => setSettingsSection("privacy")}
       />
     );
@@ -311,11 +284,7 @@ export default function App() {
     mobileScreen = (
       <Conversation
         chat={selectedChat}
-        contact={
-          selectedChat.contactId
-            ? getContact(selectedChat.contactId)
-            : undefined
-        }
+        contact={selectedChat.contactId ? getContact(selectedChat.contactId) : undefined}
         showBack
         onBack={() => setSelectedChatId(null)}
         onOpenInfo={handleOpenInfo}
@@ -336,18 +305,12 @@ export default function App() {
   } else if (activeTab === "status") {
     showTabBar = true;
     mobileScreen = (
-      <EmptyState
-        icon={<Clock size={64} strokeWidth={1.5} />}
-        title="No status updates yet"
-      />
+      <EmptyState icon={<Clock size={64} strokeWidth={1.5} />} title="No status updates yet" />
     );
   } else {
     showTabBar = true;
     mobileScreen = (
-      <EmptyState
-        icon={<PhoneIcon size={64} strokeWidth={1.5} />}
-        title="No recent calls"
-      />
+      <EmptyState icon={<PhoneIcon size={64} strokeWidth={1.5} />} title="No recent calls" />
     );
   }
 

@@ -1,27 +1,39 @@
-import { ChevronLeft, MessageCircle, Phone, Video, BellOff } from 'lucide-react';
-import type { Contact } from '@jchat/shared';
-import Avatar from '../components/primitives/Avatar';
-import IconButton from '../components/primitives/IconButton';
-import Pill from '../components/primitives/Pill';
-import SectionLabel from '../components/primitives/SectionLabel';
-import styles from './ContactProfile.module.css';
+import { ChevronLeft, MessageCircle, Phone, Video, BellOff } from "lucide-react";
+import type { Contact } from "@jchat/shared";
+import Avatar from "../components/primitives/Avatar";
+import IconButton from "../components/primitives/IconButton";
+import Pill from "../components/primitives/Pill";
+import SectionLabel from "../components/primitives/SectionLabel";
+import styles from "./ContactProfile.module.css";
 
 interface ContactProfileProps {
   contact: Contact;
-  variant: 'mobile' | 'panel';
+  variant: "mobile" | "panel";
   onBack: () => void;
   onMessage: () => void;
   onCall: () => void;
 }
 
-export default function ContactProfile({ contact, variant, onBack, onMessage, onCall }: ContactProfileProps) {
-  const avatarSize = variant === 'mobile' ? 100 : 96;
+export default function ContactProfile({
+  contact,
+  variant,
+  onBack,
+  onMessage,
+  onCall,
+}: ContactProfileProps) {
+  const avatarSize = variant === "mobile" ? 100 : 96;
 
   return (
     <div className={styles.screen}>
       <div className={styles.header}>
-        {variant === 'mobile' ? (
-          <IconButton icon={<ChevronLeft size={18} strokeWidth={2.2} />} variant="ghost" size={32} label="Back" onClick={onBack} />
+        {variant === "mobile" ? (
+          <IconButton
+            icon={<ChevronLeft size={18} strokeWidth={2.2} />}
+            variant="ghost"
+            size={32}
+            label="Back"
+            onClick={onBack}
+          />
         ) : (
           <span className={styles.panelTitle}>Contact info</span>
         )}
@@ -32,10 +44,10 @@ export default function ContactProfile({ contact, variant, onBack, onMessage, on
           <Avatar initials={contact.initials} color={contact.color} size={avatarSize} />
           <div className={styles.name}>{contact.name}</div>
           <div className={styles.phone}>{contact.phone}</div>
-          {variant === 'mobile' && <Pill variant="neutral">{contact.role}</Pill>}
+          {variant === "mobile" && <Pill variant="neutral">{contact.role}</Pill>}
         </div>
 
-        {variant === 'mobile' && (
+        {variant === "mobile" && (
           <div className={styles.actions}>
             <button type="button" className={styles.actionTile} onClick={onMessage}>
               <MessageCircle size={18} strokeWidth={2} />
@@ -61,7 +73,7 @@ export default function ContactProfile({ contact, variant, onBack, onMessage, on
           <p>{contact.about}</p>
         </div>
 
-        {variant === 'mobile' && (
+        {variant === "mobile" && (
           <div className={styles.rows}>
             <div className={styles.row}>
               <span>Media, links &amp; docs</span>

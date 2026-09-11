@@ -1,17 +1,23 @@
-import { Lock, MessageCircle, Bell, Moon } from 'lucide-react';
-import Avatar from '../components/primitives/Avatar';
-import SectionLabel from '../components/primitives/SectionLabel';
-import styles from './Settings.module.css';
+import { Lock, MessageCircle, Bell, Moon } from "lucide-react";
+import Avatar from "../components/primitives/Avatar";
+import SectionLabel from "../components/primitives/SectionLabel";
+import styles from "./Settings.module.css";
 
 interface SettingsProps {
-  variant: 'mobile' | 'sidebar';
-  activeSection: 'privacy' | null;
+  variant: "mobile" | "sidebar";
+  activeSection: "privacy" | null;
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onOpenPrivacy: () => void;
 }
 
-export default function Settings({ variant, activeSection, darkMode, onToggleDarkMode, onOpenPrivacy }: SettingsProps) {
+export default function Settings({
+  variant,
+  activeSection,
+  darkMode,
+  onToggleDarkMode,
+  onOpenPrivacy,
+}: SettingsProps) {
   return (
     <div className={styles.screen}>
       <div className={styles.header}>
@@ -33,7 +39,7 @@ export default function Settings({ variant, activeSection, darkMode, onToggleDar
 
         <button
           type="button"
-          className={`${styles.row} ${variant === 'sidebar' && activeSection === 'privacy' ? styles.rowActive : ''}`}
+          className={`${styles.row} ${variant === "sidebar" && activeSection === "privacy" ? styles.rowActive : ""}`}
           onClick={onOpenPrivacy}
         >
           <div className={styles.rowIcon}>
@@ -61,7 +67,7 @@ export default function Settings({ variant, activeSection, darkMode, onToggleDar
             <Moon size={16} strokeWidth={2} />
           </div>
           <span className={styles.rowLabel}>Dark mode</span>
-          <span className={`${styles.toggle} ${darkMode ? styles.toggleOn : ''}`}>
+          <span className={`${styles.toggle} ${darkMode ? styles.toggleOn : ""}`}>
             <span className={styles.toggleThumb} />
           </span>
         </button>

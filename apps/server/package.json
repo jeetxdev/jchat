@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@jchat/shared": "workspace:*",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0"
   },
   "devDependencies": {

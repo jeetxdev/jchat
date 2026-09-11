@@ -1,7 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react';
-import styles from './IconButton.module.css';
+import type { CSSProperties, ReactNode } from "react";
+import styles from "./IconButton.module.css";
 
-type Variant = 'default' | 'accent' | 'ghost' | 'dark' | 'danger';
+type Variant = "default" | "accent" | "ghost" | "dark" | "danger";
 
 interface IconButtonProps {
   icon: ReactNode;
@@ -17,7 +17,7 @@ export default function IconButton({
   icon,
   size = 36,
   radius,
-  variant = 'default',
+  variant = "default",
   label,
   onClick,
   style,

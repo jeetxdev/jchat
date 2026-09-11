@@ -1,6 +1,6 @@
-import express from 'express';
-import { API_BASE_PATH, PORT } from './config.js';
-import { healthRouter } from './routes/health.js';
+import express from "express";
+import { API_BASE_PATH, PORT } from "./config.js";
+import { healthRouter } from "./routes/health.js";
 
 const app = express();
 
