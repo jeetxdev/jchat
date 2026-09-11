@@ -1,5 +1,7 @@
 export type AvatarColor = 'blue' | 'amber' | 'green' | 'red';
 
+export type WallpaperId = 'plain' | 'mint' | 'sand' | 'blush' | 'slate' | 'doodle';
+
 export interface Contact {
   id: string;
   name: string;
@@ -36,5 +38,6 @@ export interface Chat {
   adminIds?: string[];
   description?: string;
   pinnedMessageId?: string;
+  wallpaperId?: WallpaperId;
   messages: Message[];
 }
