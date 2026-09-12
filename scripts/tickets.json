@@ -1,0 +1,1435 @@
+{
+  "epics": [
+    {
+      "id": "FND",
+      "name": "Server foundations",
+      "goal": "The plumbing every later route leans on. Build it once, stop rewriting it."
+    },
+    {
+      "id": "DB",
+      "name": "Data layer",
+      "goal": "Postgres, Drizzle and a schema that can answer the queries the chat list needs."
+    },
+    {
+      "id": "AUTH",
+      "name": "Authentication",
+      "goal": "Hand-rolled JWT access and refresh tokens: the epic with the most to learn and the most to get wrong."
+    },
+    {
+      "id": "USR",
+      "name": "People",
+      "goal": "Finding other humans, which every messaging feature after this depends on."
+    },
+    {
+      "id": "CNV",
+      "name": "Conversations",
+      "goal": "The chat list, which is a harder query than it looks."
+    },
+    {
+      "id": "MSG",
+      "name": "Messages",
+      "goal": "Sending, reading and paginating, all over plain HTTP before any socket is involved."
+    },
+    {
+      "id": "RT",
+      "name": "Realtime",
+      "goal": "A raw ws server: rooms, heartbeats and reconnection are yours to build, which is the point."
+    },
+    {
+      "id": "ATT",
+      "name": "Attachments",
+      "goal": "Image messages, which the Conversation screen already renders."
+    },
+    {
+      "id": "OPS",
+      "name": "Hardening",
+      "goal": "The work that separates a demo from something you would leave running in public."
+    },
+    {
+      "id": "SHIP",
+      "name": "Ship it",
+      "goal": "jchat.modularhq.app, live and always on."
+    },
+    {
+      "id": "WEB",
+      "name": "Cut the client over",
+      "goal": "Retire mockData.ts. The screens are already built, so this is wiring rather than design."
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "A server you can test",
+      "outcome": "Nothing user-facing yet. At the end you have a config that refuses to boot when it is wrong, one error shape, one way to validate input, and a test command that proves it.",
+      "count": 4
+    },
+    {
+      "id": "M2",
+      "name": "Rows in Postgres",
+      "outcome": "A database in Docker, the Drizzle migration loop you will repeat a dozen more times, and the first table.",
+      "count": 3
+    },
+    {
+      "id": "M3",
+      "name": "You can sign in",
+      "outcome": "Register, log in, refresh, log out, and a protected route that returns your own profile. The first milestone that feels like a real backend.",
+      "count": 6
+    },
+    {
+      "id": "M4",
+      "name": "Two people can message each other",
+      "outcome": "Find a user, open a DM, send messages, page back through history. No sockets anywhere yet, which is deliberate: get the write path right while it is still debuggable with curl.",
+      "count": 10
+    },
+    {
+      "id": "M5",
+      "name": "The chat list works",
+      "outcome": "Unread counts, read receipts, edits and deletes. CNV-2 is the hardest SQL in the project and it sits right here.",
+      "count": 4
+    },
+    {
+      "id": "M6",
+      "name": "Messages arrive live",
+      "outcome": "The whole realtime epic, plus the logging and shutdown work it leans on. Two browsers open, type in one, watch it land in the other.",
+      "count": 10
+    },
+    {
+      "id": "M7",
+      "name": "Groups and images",
+      "outcome": "The remaining screens you already designed: GroupInfo, and the image bubbles in Conversation.",
+      "count": 5
+    },
+    {
+      "id": "M8",
+      "name": "The real client",
+      "outcome": "mockData.ts is deleted. The React app you already built now runs on your own API.",
+      "count": 4
+    },
+    {
+      "id": "M9",
+      "name": "Safe to leave running",
+      "outcome": "Rate limits, browsable API docs, integration tests against a real database, and CI that blocks a broken branch.",
+      "count": 5
+    },
+    {
+      "id": "M10",
+      "name": "Live at jchat.modularhq.app",
+      "outcome": "Built, containerised, deployed, migrating on boot, with the WebSocket upgrade surviving the proxy.",
+      "count": 4
+    }
+  ],
+  "tickets": [
+    {
+      "step": 1,
+      "id": "FND-1",
+      "title": "Typed, validated environment config",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M1",
+      "milestoneName": "A server you can test",
+      "size": "S",
+      "deps": [],
+      "what": "Parse process.env through a zod schema at startup and export a frozen, typed config object. The process should refuse to boot with a readable message when DATABASE_URL or JWT_SECRET is missing, rather than failing later with undefined.",
+      "criteria": [
+        "Booting without a required variable prints which key is missing and exits with code 1",
+        "No file outside config.ts reads process.env",
+        "Existing PORT, API_PREFIX and API_VERSION constants survive the rewrite"
+      ],
+      "paths": [
+        "apps/server/src/config.ts",
+        "apps/server/.env.example"
+      ],
+      "learn": "Fail-fast configuration, and why a typed config module beats scattered process.env reads."
+    },
+    {
+      "step": 2,
+      "id": "FND-2",
+      "title": "Standard error format and async error handling",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M1",
+      "milestoneName": "A server you can test",
+      "size": "S",
+      "deps": [
+        "FND-1"
+      ],
+      "what": "An AppError class carrying an HTTP status and a machine-readable code, plus a terminal error middleware that renders every failure as { error: { code, message, details } }. Express 5 forwards rejected async handlers automatically, so no wrapper is needed.",
+      "criteria": [
+        "Throwing new AppError(404, \"chat_not_found\", ...) returns that exact JSON shape",
+        "An unexpected throw returns a 500 with a generic message and never leaks a stack trace",
+        "Unknown routes hit a 404 handler that uses the same shape"
+      ],
+      "paths": [
+        "apps/server/src/lib/AppError.ts",
+        "apps/server/src/middleware/errorHandler.ts"
+      ],
+      "learn": "Express middleware ordering, and the difference between an operational error and a bug."
+    },
+    {
+      "step": 3,
+      "id": "FND-3",
+      "title": "Request validation middleware",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M1",
+      "milestoneName": "A server you can test",
+      "size": "S",
+      "deps": [
+        "FND-2"
+      ],
+      "what": "One validate(schema) middleware that checks body, params and query against zod schemas and replaces req values with the parsed output, so handlers receive typed, coerced data.",
+      "criteria": [
+        "A bad payload returns 400 with a per-field details array",
+        "Handlers read parsed values with no casts and no any",
+        "Query numbers such as ?limit=20 arrive as numbers"
+      ],
+      "paths": [
+        "apps/server/src/middleware/validate.ts"
+      ],
+      "learn": "Parse, do not validate: pushing unknown input into typed shapes at the edge of the system."
+    },
+    {
+      "step": 4,
+      "id": "FND-7",
+      "title": "Vitest and supertest harness",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M1",
+      "milestoneName": "A server you can test",
+      "size": "M",
+      "deps": [
+        "FND-2"
+      ],
+      "what": "Split the Express app out of the listen call so tests can import the app directly. Add Vitest plus supertest and cover /health, a 404 and a thrown AppError.",
+      "criteria": [
+        "pnpm test runs from the repo root and from apps/server",
+        "Tests import createApp() and never open a real port",
+        "Coverage reporting is wired even if the number is low at first"
+      ],
+      "paths": [
+        "apps/server/src/app.ts",
+        "apps/server/vitest.config.ts",
+        "apps/server/src/routes/health.test.ts"
+      ],
+      "learn": "Separating app construction from process startup, the single change that makes an Express codebase testable."
+    },
+    {
+      "step": 5,
+      "id": "DB-1",
+      "title": "Postgres in Docker Compose with a pooled client",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M2",
+      "milestoneName": "Rows in Postgres",
+      "size": "S",
+      "deps": [
+        "FND-1"
+      ],
+      "what": "A compose file with a pinned Postgres image and a named volume, plus a pg Pool created once and exported. Wire a readiness check that runs SELECT 1.",
+      "criteria": [
+        "docker compose up -d brings up a database the server can reach",
+        "The pool is created once per process, never per request",
+        "GET /api/v1/health reports database reachability"
+      ],
+      "paths": [
+        "docker-compose.yml",
+        "apps/server/src/db/client.ts"
+      ],
+      "learn": "Connection pooling, and why opening a connection per request destroys a Node server."
+    },
+    {
+      "step": 6,
+      "id": "DB-2",
+      "title": "Drizzle Kit wiring and the migration loop",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M2",
+      "milestoneName": "Rows in Postgres",
+      "size": "M",
+      "deps": [
+        "DB-1"
+      ],
+      "what": "Install drizzle-orm and drizzle-kit, add drizzle.config.ts, and settle the loop you will repeat for every table: edit schema, generate SQL, review the SQL, apply. Add db:generate, db:migrate and db:studio scripts.",
+      "criteria": [
+        "Generated SQL lands in a committed migrations folder and is reviewed before applying",
+        "Migrations apply cleanly against an empty database",
+        "The typed db client is exported from one module"
+      ],
+      "paths": [
+        "apps/server/drizzle.config.ts",
+        "apps/server/src/db/index.ts",
+        "apps/server/drizzle/"
+      ],
+      "learn": "Why migrations are committed artifacts rather than something generated at deploy time."
+    },
+    {
+      "step": 7,
+      "id": "DB-3",
+      "title": "users table",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M2",
+      "milestoneName": "Rows in Postgres",
+      "size": "S",
+      "deps": [
+        "DB-2"
+      ],
+      "what": "Columns for id (uuid), email (citext or lowercased with a unique index), password_hash, display_name, about, phone, avatar_color, created_at, updated_at. Add the timestamp defaults now so later tables copy the pattern.",
+      "criteria": [
+        "Two users cannot register the same email in different cases",
+        "The Drizzle model infers a User type consumed by @jchat/shared",
+        "password_hash is never selectable through the shared public type"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/users.ts",
+        "packages/shared/src/types.ts"
+      ],
+      "learn": "Modelling identity, and keeping secret columns out of types that travel to the client."
+    },
+    {
+      "step": 8,
+      "id": "AUTH-1",
+      "title": "Register with argon2 password hashing",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "M",
+      "deps": [
+        "DB-3",
+        "FND-3"
+      ],
+      "what": "POST /api/v1/auth/register hashes the password with argon2id and creates the user. Return the same generic response whether or not the email was taken, so the endpoint cannot be used to enumerate accounts.",
+      "criteria": [
+        "The stored hash includes its own salt and parameters",
+        "A weak or short password is rejected by the zod schema",
+        "Response time does not obviously differ for taken and free emails"
+      ],
+      "paths": [
+        "apps/server/src/routes/auth.ts",
+        "apps/server/src/services/auth.service.ts"
+      ],
+      "learn": "Why password hashing must be slow, and what a timing side channel gives away."
+    },
+    {
+      "step": 9,
+      "id": "AUTH-2",
+      "title": "Login and access-token signing",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "M",
+      "deps": [
+        "AUTH-1"
+      ],
+      "what": "POST /api/v1/auth/login verifies the password and returns a short-lived access token (roughly 15 minutes) in the JSON body, signed HS256 with a sub, iat and exp.",
+      "criteria": [
+        "A wrong password and an unknown email return the same 401 body",
+        "The token payload carries no personal data beyond the user id",
+        "Token lifetime comes from config, not a literal"
+      ],
+      "paths": [
+        "apps/server/src/services/token.service.ts"
+      ],
+      "learn": "What a JWT actually is: signed, not encrypted, and readable by anyone holding it."
+    },
+    {
+      "step": 10,
+      "id": "AUTH-4",
+      "title": "requireAuth middleware",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "S",
+      "deps": [
+        "AUTH-2"
+      ],
+      "what": "Read the bearer token, verify the signature and expiry, load the user id onto req.auth, and augment the Express Request type so downstream handlers see it without casting.",
+      "criteria": [
+        "An expired token returns 401 with a distinct code from a malformed one",
+        "req.auth.userId is typed everywhere with no any",
+        "A protected route with no header never touches the database"
+      ],
+      "paths": [
+        "apps/server/src/middleware/requireAuth.ts",
+        "apps/server/src/types/express.d.ts"
+      ],
+      "learn": "Declaration merging in TypeScript, the idiomatic way to extend Express types."
+    },
+    {
+      "step": 11,
+      "id": "AUTH-3",
+      "title": "Refresh-token rotation with reuse detection",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "L",
+      "deps": [
+        "AUTH-2"
+      ],
+      "what": "A refresh_tokens table storing hashed tokens with a family id. POST /auth/refresh issues a new pair and revokes the old token. Presenting an already-used token revokes the whole family, on the assumption it was stolen. Send the refresh token as an httpOnly, secure, sameSite cookie.",
+      "criteria": [
+        "Refreshing twice with the same token logs the session out entirely",
+        "Refresh tokens are stored hashed, never in plaintext",
+        "The cookie is httpOnly and scoped to the refresh path only"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/refreshTokens.ts",
+        "apps/server/src/routes/auth.ts"
+      ],
+      "learn": "The whole reason refresh tokens exist, and why rotation without reuse detection buys you very little."
+    },
+    {
+      "step": 12,
+      "id": "AUTH-5",
+      "title": "Logout and revoke every session",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "S",
+      "deps": [
+        "AUTH-3"
+      ],
+      "what": "POST /auth/logout revokes the presented refresh token and clears the cookie. POST /auth/logout-all revokes every family for the user, which is what a Settings screen needs.",
+      "criteria": [
+        "After logout the refresh token is rejected",
+        "The access token still works until it expires, and that is documented",
+        "logout-all requires a valid access token"
+      ],
+      "paths": [
+        "apps/server/src/routes/auth.ts"
+      ],
+      "learn": "The core tradeoff of stateless tokens: you cannot un-issue one, only outlive it."
+    },
+    {
+      "step": 13,
+      "id": "AUTH-6",
+      "title": "Profile read and update",
+      "epicId": "AUTH",
+      "epicName": "Authentication",
+      "milestoneId": "M3",
+      "milestoneName": "You can sign in",
+      "size": "S",
+      "deps": [
+        "AUTH-4"
+      ],
+      "what": "GET /api/v1/me returns the signed-in user. PATCH /api/v1/me updates display name, about and avatar colour, mapping onto the fields the Settings and ContactProfile screens already render.",
+      "criteria": [
+        "PATCH accepts a partial body and ignores unknown keys",
+        "Email and password are not editable here",
+        "The response uses the shared public user type"
+      ],
+      "paths": [
+        "apps/server/src/routes/me.ts"
+      ],
+      "learn": "PATCH semantics, and why partial updates need a different schema from creates."
+    },
+    {
+      "step": 14,
+      "id": "DB-4",
+      "title": "conversations and conversation_members",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "M",
+      "deps": [
+        "DB-3"
+      ],
+      "what": "A conversations table with kind (dm or group), name, description and pinned_message_id, and a conversation_members join table with role, joined_at and last_read_message_id. Composite primary key on (conversation_id, user_id).",
+      "criteria": [
+        "A user cannot be added to the same conversation twice",
+        "Deleting a user cascades to their memberships",
+        "Group-only columns are nullable and documented as such"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/conversations.ts"
+      ],
+      "learn": "Many-to-many modelling, and putting the state that belongs to a membership on the join table."
+    },
+    {
+      "step": 15,
+      "id": "DB-5",
+      "title": "messages table and the pagination index",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "M",
+      "deps": [
+        "DB-4"
+      ],
+      "what": "Columns for id, conversation_id, author_id, body, client_key, created_at, edited_at and deleted_at. Add the composite index on (conversation_id, created_at DESC, id DESC) that keyset pagination will use.",
+      "criteria": [
+        "EXPLAIN on the history query shows an index scan, not a sequential scan",
+        "Deleting a conversation removes its messages",
+        "client_key is unique per author so retries cannot duplicate"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/messages.ts"
+      ],
+      "learn": "Reading an EXPLAIN plan, and designing the index alongside the query it serves."
+    },
+    {
+      "step": 16,
+      "id": "USR-3",
+      "title": "Move initials and avatar colour into @jchat/shared",
+      "epicId": "USR",
+      "epicName": "People",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "S",
+      "deps": [
+        "DB-3"
+      ],
+      "what": "The client derives initials and an avatar colour from a name. Move that logic into the shared package so the server assigns the same colour at registration and both sides agree.",
+      "criteria": [
+        "One function, imported by both apps",
+        "The colour is stable for a given user id",
+        "Unit tested in the shared package"
+      ],
+      "paths": [
+        "packages/shared/src/avatar.ts",
+        "apps/web/src/components/primitives/Avatar.tsx"
+      ],
+      "learn": "What actually belongs in a shared package in a monorepo, and what does not."
+    },
+    {
+      "step": 17,
+      "id": "USR-1",
+      "title": "User directory search",
+      "epicId": "USR",
+      "epicName": "People",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "S",
+      "deps": [
+        "AUTH-4"
+      ],
+      "what": "GET /api/v1/users?q= returns users matching a name or email prefix, capped and excluding the caller. This backs the New Chat picker.",
+      "criteria": [
+        "An empty or one-character query returns 400 rather than the whole table",
+        "Results are limited and never include email addresses of non-contacts",
+        "Search is case-insensitive"
+      ],
+      "paths": [
+        "apps/server/src/routes/users.ts"
+      ],
+      "learn": "Designing a search endpoint that cannot be used to scrape your user table."
+    },
+    {
+      "step": 18,
+      "id": "CNV-1",
+      "title": "Open or reopen a direct message",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "M",
+      "deps": [
+        "DB-4",
+        "AUTH-4"
+      ],
+      "what": "POST /api/v1/conversations/dm with a target user id returns the existing DM if one exists and creates it otherwise, inside a transaction so two fast taps cannot create two rooms.",
+      "criteria": [
+        "Calling it twice returns the same conversation id",
+        "Concurrent calls do not produce duplicate DMs",
+        "Returns 201 on create and 200 on fetch"
+      ],
+      "paths": [
+        "apps/server/src/routes/conversations.ts",
+        "apps/server/src/services/conversation.service.ts"
+      ],
+      "learn": "Transactions and unique constraints as the real defence against a race, rather than a check-then-insert."
+    },
+    {
+      "step": 19,
+      "id": "CNV-3",
+      "title": "Fetch one conversation behind a membership guard",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "S",
+      "deps": [
+        "CNV-1"
+      ],
+      "what": "GET /api/v1/conversations/:id with a reusable requireMembership guard, since every message route needs the same check.",
+      "criteria": [
+        "A non-member gets 404, not 403, so the endpoint does not confirm the room exists",
+        "The guard is one middleware reused by the message routes",
+        "The membership lookup is a single indexed query"
+      ],
+      "paths": [
+        "apps/server/src/middleware/requireMembership.ts"
+      ],
+      "learn": "Authorisation as distinct from authentication, and when a 404 is the more secure answer."
+    },
+    {
+      "step": 20,
+      "id": "MSG-1",
+      "title": "Send a message over REST",
+      "epicId": "MSG",
+      "epicName": "Messages",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "M",
+      "deps": [
+        "CNV-3",
+        "DB-5"
+      ],
+      "what": "POST /api/v1/conversations/:id/messages inserts the row and returns the created message with its server timestamp and id. Realtime comes later; get the write path correct first.",
+      "criteria": [
+        "Empty or whitespace-only bodies are rejected",
+        "Body length is capped and the cap is in config",
+        "The response is the full message object the client can render immediately"
+      ],
+      "paths": [
+        "apps/server/src/routes/messages.ts"
+      ],
+      "learn": "Why the server, never the client, owns ids and timestamps."
+    },
+    {
+      "step": 21,
+      "id": "MSG-3",
+      "title": "Idempotent sends with a client key",
+      "epicId": "MSG",
+      "epicName": "Messages",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "M",
+      "deps": [
+        "MSG-1"
+      ],
+      "what": "The client generates a uuid per message and sends it as client_key. A retry after a dropped response returns the original message instead of creating a second one.",
+      "criteria": [
+        "Posting the same client_key twice returns the same message id",
+        "The unique constraint, not an application check, is what enforces it",
+        "A duplicate returns 200 while a fresh send returns 201"
+      ],
+      "paths": [
+        "apps/server/src/services/message.service.ts"
+      ],
+      "learn": "Idempotency keys, the standard answer to at-least-once delivery over an unreliable network."
+    },
+    {
+      "step": 22,
+      "id": "MSG-2",
+      "title": "Cursor-paginated history",
+      "epicId": "MSG",
+      "epicName": "Messages",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "L",
+      "deps": [
+        "MSG-1"
+      ],
+      "what": "GET /conversations/:id/messages?before=<cursor>&limit=50 returning newest first with an opaque cursor built from (created_at, id). Not OFFSET, which drifts as new messages arrive.",
+      "criteria": [
+        "Paging back through a conversation while new messages land never skips or repeats a row",
+        "The cursor is opaque to the client and validated on the way in",
+        "The query uses the DB-5 index"
+      ],
+      "paths": [
+        "apps/server/src/services/message.service.ts"
+      ],
+      "learn": "Keyset versus offset pagination, and why every chat app in the world uses keyset."
+    },
+    {
+      "step": 23,
+      "id": "DB-6",
+      "title": "Seed script from the web mock data",
+      "epicId": "DB",
+      "epicName": "Data layer",
+      "milestoneId": "M4",
+      "milestoneName": "Two people can message each other",
+      "size": "S",
+      "deps": [
+        "DB-5"
+      ],
+      "what": "Port the four contacts and their chats out of the client mock into a seed script, so a fresh database gives you the same screens you already designed against.",
+      "criteria": [
+        "pnpm db:seed is idempotent and safe to run twice",
+        "Every seeded account shares one known development password",
+        "The seed refuses to run against a non-local DATABASE_URL"
+      ],
+      "paths": [
+        "apps/server/src/db/seed.ts",
+        "apps/web/src/data/mockData.ts"
+      ],
+      "learn": "Seed data as a development tool, and guarding destructive scripts against the wrong environment."
+    },
+    {
+      "step": 24,
+      "id": "CNV-2",
+      "title": "Conversation list with last message and unread count",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M5",
+      "milestoneName": "The chat list works",
+      "size": "L",
+      "deps": [
+        "CNV-1",
+        "DB-5"
+      ],
+      "what": "GET /api/v1/conversations returns every conversation the caller belongs to with its latest message, the other member for DMs, and a count of messages after the caller last_read_message_id. Sorted by latest activity. This is the ChatList screen in one request.",
+      "criteria": [
+        "One round trip to Postgres, not one query per conversation",
+        "A conversation with no messages still appears",
+        "The response maps cleanly onto the existing Chat type"
+      ],
+      "paths": [
+        "apps/server/src/services/conversation.service.ts"
+      ],
+      "learn": "The N+1 query problem, lateral joins and window functions. The single most valuable SQL ticket here."
+    },
+    {
+      "step": 25,
+      "id": "MSG-4",
+      "title": "Edit and soft-delete",
+      "epicId": "MSG",
+      "epicName": "Messages",
+      "milestoneId": "M5",
+      "milestoneName": "The chat list works",
+      "size": "M",
+      "deps": [
+        "MSG-2"
+      ],
+      "what": "PATCH and DELETE on a message, author-only. Deletion sets deleted_at and blanks the body rather than removing the row, so pagination cursors and reply references survive.",
+      "criteria": [
+        "Editing someone else message returns 403",
+        "A deleted message still occupies its position in the timeline",
+        "edited_at is set and surfaced in the response"
+      ],
+      "paths": [
+        "apps/server/src/routes/messages.ts"
+      ],
+      "learn": "Soft deletes, and the query discipline they demand everywhere afterwards."
+    },
+    {
+      "step": 26,
+      "id": "MSG-5",
+      "title": "Read receipts and unread counts",
+      "epicId": "MSG",
+      "epicName": "Messages",
+      "milestoneId": "M5",
+      "milestoneName": "The chat list works",
+      "size": "L",
+      "deps": [
+        "MSG-2",
+        "CNV-2"
+      ],
+      "what": "POST /conversations/:id/read with the last message id the user has seen, advancing conversation_members.last_read_message_id and never moving it backwards. Unread counts derive from it.",
+      "criteria": [
+        "Marking an older message as read does not decrease the pointer",
+        "Unread counts in the list endpoint match what the conversation shows",
+        "A user own messages never count as unread"
+      ],
+      "paths": [
+        "apps/server/src/routes/conversations.ts",
+        "apps/server/src/services/conversation.service.ts"
+      ],
+      "learn": "Monotonic state, and storing a pointer instead of a row per message per reader."
+    },
+    {
+      "step": 27,
+      "id": "USR-2",
+      "title": "Contacts add, remove and list",
+      "epicId": "USR",
+      "epicName": "People",
+      "milestoneId": "M5",
+      "milestoneName": "The chat list works",
+      "size": "M",
+      "deps": [
+        "USR-1"
+      ],
+      "what": "A contacts table (owner_id, contact_id, created_at) plus endpoints to list, add and remove. Decide deliberately whether contacts are one-directional, and write the decision down.",
+      "criteria": [
+        "Adding the same contact twice is a no-op, not an error",
+        "You cannot add yourself",
+        "The list returns the fields ContactProfile renders"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/contacts.ts",
+        "apps/server/src/routes/contacts.ts"
+      ],
+      "learn": "Idempotent writes, and why PUT-like behaviour is friendlier than a 409 here."
+    },
+    {
+      "step": 28,
+      "id": "FND-4",
+      "title": "Structured logging with request ids",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "S",
+      "deps": [
+        "FND-2"
+      ],
+      "what": "Add pino and pino-http. Attach a request id to every inbound request, log method, path, status and duration, and pretty-print in development only.",
+      "criteria": [
+        "Every log line in production is a single JSON object",
+        "The same request id appears on the access log line and on any error logged from that request",
+        "Passwords and tokens are redacted"
+      ],
+      "paths": [
+        "apps/server/src/lib/logger.ts",
+        "apps/server/src/index.ts"
+      ],
+      "learn": "Why structured logs beat console.log once something is deployed and you cannot attach a debugger."
+    },
+    {
+      "step": 29,
+      "id": "FND-6",
+      "title": "Graceful shutdown",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "S",
+      "deps": [
+        "FND-4"
+      ],
+      "what": "On SIGTERM and SIGINT: stop accepting connections, let in-flight requests finish, close the database pool, then exit. Force-exit after a timeout so a stuck socket cannot hang a deploy.",
+      "criteria": [
+        "Ctrl+C during an in-flight request lets that request complete",
+        "The process exits within the timeout even with an open connection",
+        "Shutdown reason and duration are logged"
+      ],
+      "paths": [
+        "apps/server/src/index.ts",
+        "apps/server/src/server.ts"
+      ],
+      "learn": "The Node process lifecycle, and why a container platform sends SIGTERM before SIGKILL."
+    },
+    {
+      "step": 30,
+      "id": "RT-1",
+      "title": "Attach a ws server and authenticate the upgrade",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "L",
+      "deps": [
+        "AUTH-4",
+        "FND-6"
+      ],
+      "what": "Create the WebSocketServer with noServer: true and handle the HTTP upgrade event yourself, verifying the access token before completing the handshake. Reject unauthenticated upgrades with 401 rather than accepting and closing.",
+      "criteria": [
+        "An upgrade with no valid token never becomes an open socket",
+        "The authenticated user id is attached to the socket",
+        "The ws server shuts down with the HTTP server from FND-6"
+      ],
+      "paths": [
+        "apps/server/src/realtime/server.ts",
+        "apps/server/src/server.ts"
+      ],
+      "learn": "How a WebSocket connection begins life as an HTTP request, and where you get to intervene."
+    },
+    {
+      "step": 31,
+      "id": "RT-2",
+      "title": "Typed socket protocol in @jchat/shared",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "M",
+      "deps": [
+        "RT-1"
+      ],
+      "what": "A discriminated union of client-to-server and server-to-client frames, each with a type field, defined once in the shared package and parsed with zod on receipt. Version the protocol from the start.",
+      "criteria": [
+        "Both apps import the same frame types",
+        "An unknown or malformed frame is logged and ignored, never crashing the connection",
+        "Switching on frame.type narrows exhaustively in TypeScript"
+      ],
+      "paths": [
+        "packages/shared/src/realtime.ts"
+      ],
+      "learn": "Discriminated unions and exhaustiveness checking, TypeScript at its most useful."
+    },
+    {
+      "step": 32,
+      "id": "RT-3",
+      "title": "Connection registry and per-conversation fan-out",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "L",
+      "deps": [
+        "RT-2",
+        "CNV-3"
+      ],
+      "what": "A Map from user id to their open sockets (a user has several tabs), and a publish(conversationId, frame) that looks up members and writes to each of their sockets. Membership decides delivery, so no client can subscribe its way into a room.",
+      "criteria": [
+        "A user with three tabs receives the message on all three",
+        "A non-member never receives a frame for that conversation",
+        "Closed sockets are removed from the registry on close and on error"
+      ],
+      "paths": [
+        "apps/server/src/realtime/registry.ts",
+        "apps/server/src/realtime/publish.ts"
+      ],
+      "learn": "Server-side subscription state, and why the server rather than the client decides who is in a room."
+    },
+    {
+      "step": 33,
+      "id": "RT-4",
+      "title": "Heartbeats and dead-socket reaping",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "M",
+      "deps": [
+        "RT-3"
+      ],
+      "what": "A ping on an interval with an isAlive flag cleared on each ping and set on pong. Terminate sockets that miss a round. Without this, half-open connections accumulate until the process runs out of memory.",
+      "criteria": [
+        "Killing a client at the network level frees its registry entry within one interval",
+        "The interval is cleared on shutdown so tests do not hang",
+        "terminate is used for dead sockets, close for clean ones"
+      ],
+      "paths": [
+        "apps/server/src/realtime/heartbeat.ts"
+      ],
+      "learn": "Why TCP will not tell you a peer is gone, and what a half-open connection costs."
+    },
+    {
+      "step": 34,
+      "id": "RT-5",
+      "title": "Broadcast sends, edits and receipts",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "M",
+      "deps": [
+        "RT-3",
+        "MSG-5"
+      ],
+      "what": "Have the message service publish after a successful commit, so a socket frame never announces a write that rolled back. The REST endpoints stay as they are and gain a broadcast.",
+      "criteria": [
+        "A failed insert broadcasts nothing",
+        "The sender other tabs receive the message too",
+        "The frame payload is the same object the REST response returns"
+      ],
+      "paths": [
+        "apps/server/src/services/message.service.ts",
+        "apps/server/src/realtime/publish.ts"
+      ],
+      "learn": "Ordering side effects after a transaction commits, and the dual-write problem this avoids."
+    },
+    {
+      "step": 35,
+      "id": "RT-6",
+      "title": "Typing indicators",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "S",
+      "deps": [
+        "RT-3"
+      ],
+      "what": "A client typing frame that fans out to the other members and is never persisted. Throttle on the client, expire on the server after a few seconds of silence.",
+      "criteria": [
+        "Nothing about typing is written to Postgres",
+        "The indicator clears on its own if the sender disappears",
+        "Your own typing frame is not echoed back to you"
+      ],
+      "paths": [
+        "apps/server/src/realtime/handlers/typing.ts"
+      ],
+      "learn": "Ephemeral state, and recognising the data that must never touch a database."
+    },
+    {
+      "step": 36,
+      "id": "RT-7",
+      "title": "Presence and last seen",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "M",
+      "deps": [
+        "RT-4"
+      ],
+      "what": "Derive online from the registry rather than a column: a user is online while they hold at least one socket. Write last_seen_at on the last disconnect. This backs the online dot in ChatList and ContactProfile.",
+      "criteria": [
+        "Closing one of three tabs leaves the user online",
+        "A crash still results in offline once the heartbeat reaps the socket",
+        "Presence changes fan out only to that user contacts"
+      ],
+      "paths": [
+        "apps/server/src/realtime/presence.ts"
+      ],
+      "learn": "Derived state over stored state, and why an is_online column always drifts out of date."
+    },
+    {
+      "step": 37,
+      "id": "RT-8",
+      "title": "Reconnect and catch-up",
+      "epicId": "RT",
+      "epicName": "Realtime",
+      "milestoneId": "M6",
+      "milestoneName": "Messages arrive live",
+      "size": "L",
+      "deps": [
+        "RT-5",
+        "MSG-2"
+      ],
+      "what": "The client reconnects with exponential backoff and jitter, sending the last message id it holds per conversation. The server replies with everything since, so a tunnel or a sleeping laptop does not lose messages.",
+      "criteria": [
+        "Killing the server and restarting it restores a live client with no gap",
+        "Backoff has jitter, so a restart does not stampede every client at once",
+        "Catch-up reuses the MSG-2 pagination path rather than a second code path"
+      ],
+      "paths": [
+        "apps/server/src/realtime/handlers/sync.ts",
+        "apps/web/src/hooks/useSocket.ts"
+      ],
+      "learn": "At-least-once delivery over an unreliable transport, the problem Socket.IO would have hidden from you."
+    },
+    {
+      "step": 38,
+      "id": "CNV-4",
+      "title": "Create a group and manage its members",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M7",
+      "milestoneName": "Groups and images",
+      "size": "M",
+      "deps": [
+        "CNV-3"
+      ],
+      "what": "POST /conversations/groups with a name and member ids, plus endpoints to add and remove members. The creator becomes the first admin.",
+      "criteria": [
+        "Only an admin can add or remove members",
+        "An admin cannot remove the last admin",
+        "Leaving a group you are not in returns 404"
+      ],
+      "paths": [
+        "apps/server/src/routes/conversations.ts"
+      ],
+      "learn": "Role checks that live in the service layer rather than being scattered across handlers."
+    },
+    {
+      "step": 39,
+      "id": "CNV-5",
+      "title": "Group metadata and admin actions",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M7",
+      "milestoneName": "Groups and images",
+      "size": "M",
+      "deps": [
+        "CNV-4"
+      ],
+      "what": "PATCH the group name and description, promote and demote admins. Backs the GroupInfo screen.",
+      "criteria": [
+        "Every mutation emits an event the realtime epic can broadcast later",
+        "Changes are validated for length and trimmed",
+        "Non-admins receive 403 with a clear code"
+      ],
+      "paths": [
+        "apps/server/src/routes/conversations.ts",
+        "apps/web/src/screens/GroupInfo.tsx"
+      ],
+      "learn": "Designing service functions that return a result plus the events to publish."
+    },
+    {
+      "step": 40,
+      "id": "CNV-6",
+      "title": "Pin a message",
+      "epicId": "CNV",
+      "epicName": "Conversations",
+      "milestoneId": "M7",
+      "milestoneName": "Groups and images",
+      "size": "S",
+      "deps": [
+        "CNV-5",
+        "DB-5"
+      ],
+      "what": "Set and clear conversations.pinned_message_id, validating that the message belongs to that conversation. The Conversation screen already renders a pinned banner.",
+      "criteria": [
+        "Pinning a message from another conversation is rejected",
+        "Unpinning clears the column",
+        "Deleting the pinned message clears the pin"
+      ],
+      "paths": [
+        "apps/server/src/routes/conversations.ts"
+      ],
+      "learn": "Referential integrity you have to enforce yourself when a foreign key alone is not enough."
+    },
+    {
+      "step": 41,
+      "id": "ATT-1",
+      "title": "Image upload with real validation",
+      "epicId": "ATT",
+      "epicName": "Attachments",
+      "milestoneId": "M7",
+      "milestoneName": "Groups and images",
+      "size": "M",
+      "deps": [
+        "AUTH-4"
+      ],
+      "what": "POST /api/v1/uploads accepting one image behind multer, with a size cap and a content type checked from the file magic bytes rather than the client-supplied header. Store on disk behind an interface you can swap for object storage later.",
+      "criteria": [
+        "A renamed .exe is rejected despite claiming image/png",
+        "Oversized uploads are rejected before the whole body is buffered",
+        "The storage adapter is an interface with a local implementation"
+      ],
+      "paths": [
+        "apps/server/src/routes/uploads.ts",
+        "apps/server/src/storage/index.ts"
+      ],
+      "learn": "Streams and multipart parsing, and why a Content-Type header is a claim rather than a fact."
+    },
+    {
+      "step": 42,
+      "id": "ATT-2",
+      "title": "Attach media to a message and serve it",
+      "epicId": "ATT",
+      "epicName": "Attachments",
+      "milestoneId": "M7",
+      "milestoneName": "Groups and images",
+      "size": "M",
+      "deps": [
+        "ATT-1",
+        "MSG-1"
+      ],
+      "what": "An attachments table linked to messages, plus a download route that checks conversation membership before serving bytes. Caption and dimensions travel with the message.",
+      "criteria": [
+        "A non-member cannot fetch the file even with the exact URL",
+        "Responses carry cache headers and an accurate content type",
+        "An orphaned upload is cleaned up or expires"
+      ],
+      "paths": [
+        "apps/server/src/db/schema/attachments.ts",
+        "apps/server/src/routes/media.ts"
+      ],
+      "learn": "Authorising static assets, the step people skip when they hand out unguessable URLs."
+    },
+    {
+      "step": 43,
+      "id": "WEB-1",
+      "title": "API client and token storage",
+      "epicId": "WEB",
+      "epicName": "Cut the client over",
+      "milestoneId": "M8",
+      "milestoneName": "The real client",
+      "size": "M",
+      "deps": [
+        "AUTH-3"
+      ],
+      "what": "A small typed fetch wrapper that attaches the access token, refreshes once on a 401 and replays the original request, queueing concurrent calls so a burst triggers one refresh rather than five.",
+      "criteria": [
+        "Three simultaneous 401s cause exactly one refresh call",
+        "The access token lives in memory, not localStorage",
+        "A failed refresh routes to the login screen once"
+      ],
+      "paths": [
+        "apps/web/src/lib/api.ts"
+      ],
+      "learn": "Why an access token in localStorage is an XSS liability, and the memory plus httpOnly-cookie pattern instead."
+    },
+    {
+      "step": 44,
+      "id": "WEB-2",
+      "title": "Login and register screens",
+      "epicId": "WEB",
+      "epicName": "Cut the client over",
+      "milestoneId": "M8",
+      "milestoneName": "The real client",
+      "size": "M",
+      "deps": [
+        "WEB-1"
+      ],
+      "what": "Two screens in the existing visual language, plus a session boot that attempts a silent refresh on load so a returning user is not asked to log in again.",
+      "criteria": [
+        "Server error codes map to field-level messages",
+        "The app shows a loading state during the silent refresh rather than flashing the login screen",
+        "Forms are keyboard and screen-reader usable"
+      ],
+      "paths": [
+        "apps/web/src/screens/Login.tsx",
+        "apps/web/src/App.tsx"
+      ],
+      "learn": "Auth as an application state machine: unknown, authenticated, anonymous."
+    },
+    {
+      "step": 45,
+      "id": "WEB-3",
+      "title": "Replace mockData with server queries",
+      "epicId": "WEB",
+      "epicName": "Cut the client over",
+      "milestoneId": "M8",
+      "milestoneName": "The real client",
+      "size": "L",
+      "deps": [
+        "WEB-2",
+        "CNV-2"
+      ],
+      "what": "Add TanStack Query and swap chats, contacts, getChat and getContact for real requests, one screen at a time. Delete mockData.ts last, once nothing imports it.",
+      "criteria": [
+        "Every screen handles loading, empty and error states",
+        "Message history pages in on scroll using the MSG-2 cursor",
+        "mockData.ts is deleted and the build still passes"
+      ],
+      "paths": [
+        "apps/web/src/data/mockData.ts",
+        "apps/web/src/screens/ChatList.tsx"
+      ],
+      "learn": "Server state versus client state, and why a query cache is not the same thing as a store."
+    },
+    {
+      "step": 46,
+      "id": "WEB-4",
+      "title": "Live socket hook and optimistic send",
+      "epicId": "WEB",
+      "epicName": "Cut the client over",
+      "milestoneId": "M8",
+      "milestoneName": "The real client",
+      "size": "L",
+      "deps": [
+        "WEB-3",
+        "RT-8"
+      ],
+      "what": "A useSocket hook owning one connection for the app, pushing incoming frames into the query cache. Sending renders the message immediately with its client key and reconciles when the server frame arrives.",
+      "criteria": [
+        "A message sent in one browser appears in another within a second",
+        "An optimistic message is replaced, not duplicated, when its server copy lands",
+        "A failed send is marked as failed and can be retried"
+      ],
+      "paths": [
+        "apps/web/src/hooks/useSocket.ts",
+        "apps/web/src/screens/Conversation.tsx"
+      ],
+      "learn": "Optimistic UI and reconciliation by client key, which is exactly what MSG-3 was built for."
+    },
+    {
+      "step": 47,
+      "id": "FND-5",
+      "title": "Security headers, CORS and body limits",
+      "epicId": "FND",
+      "epicName": "Server foundations",
+      "milestoneId": "M9",
+      "milestoneName": "Safe to leave running",
+      "size": "S",
+      "deps": [
+        "FND-1"
+      ],
+      "what": "helmet for headers, a cors policy that allows the Vite origin with credentials in development and nothing cross-origin in production (same origin there), and an explicit express.json size limit.",
+      "criteria": [
+        "The dev client can call the API with cookies attached",
+        "An oversized JSON body is rejected with 413 in the standard error shape",
+        "Production responses carry the helmet defaults"
+      ],
+      "paths": [
+        "apps/server/src/index.ts"
+      ],
+      "learn": "What CORS actually gates, and why credentials change the rules."
+    },
+    {
+      "step": 48,
+      "id": "OPS-1",
+      "title": "Rate limiting",
+      "epicId": "OPS",
+      "epicName": "Hardening",
+      "milestoneId": "M9",
+      "milestoneName": "Safe to leave running",
+      "size": "M",
+      "deps": [
+        "AUTH-2"
+      ],
+      "what": "A global limit plus a much tighter one on login, register and refresh, keyed by IP and by account. Return 429 with Retry-After in the standard error shape.",
+      "criteria": [
+        "Repeated failed logins for one account are throttled regardless of source IP",
+        "Limits are configurable and disabled in tests",
+        "The limiter store survives a restart, or its loss is a documented tradeoff"
+      ],
+      "paths": [
+        "apps/server/src/middleware/rateLimit.ts"
+      ],
+      "learn": "Credential stuffing as the actual threat, and why IP-only limiting does not stop it."
+    },
+    {
+      "step": 49,
+      "id": "OPS-2",
+      "title": "OpenAPI spec and browsable docs",
+      "epicId": "OPS",
+      "epicName": "Hardening",
+      "milestoneId": "M9",
+      "milestoneName": "Safe to leave running",
+      "size": "M",
+      "deps": [
+        "FND-3",
+        "MSG-2"
+      ],
+      "what": "Generate the OpenAPI document from the zod schemas you already wrote, and serve it with Scalar at /api/docs in development. Keep the existing Bruno collection in sync.",
+      "criteria": [
+        "The spec is generated from the schemas, never hand-maintained",
+        "Every endpoint documents its error codes",
+        "Docs are not exposed in production unless deliberately enabled"
+      ],
+      "paths": [
+        "apps/server/src/openapi.ts",
+        "apps/server/docs/Api_Collection/"
+      ],
+      "learn": "Single-sourcing validation and documentation so they cannot disagree."
+    },
+    {
+      "step": 50,
+      "id": "OPS-3",
+      "title": "Integration tests against a real Postgres",
+      "epicId": "OPS",
+      "epicName": "Hardening",
+      "milestoneId": "M9",
+      "milestoneName": "Safe to leave running",
+      "size": "L",
+      "deps": [
+        "FND-7",
+        "MSG-5"
+      ],
+      "what": "Run the suite against a throwaway database, migrating before and truncating between tests. Cover the auth flow end to end, the conversation list query and message pagination.",
+      "criteria": [
+        "The suite passes from a clean checkout with only docker compose up",
+        "Tests are order-independent",
+        "The realtime path has at least one test with two real socket clients"
+      ],
+      "paths": [
+        "apps/server/src/test/setup.ts",
+        "apps/server/src/test/"
+      ],
+      "learn": "Testing against the real database rather than mocks, and where each approach earns its place."
+    },
+    {
+      "step": 51,
+      "id": "OPS-4",
+      "title": "GitHub Actions CI",
+      "epicId": "OPS",
+      "epicName": "Hardening",
+      "milestoneId": "M9",
+      "milestoneName": "Safe to leave running",
+      "size": "M",
+      "deps": [
+        "OPS-3"
+      ],
+      "what": "A workflow running lint, typecheck, test and build on every push, with a Postgres service container and a pnpm store cache.",
+      "criteria": [
+        "A failing test blocks the branch",
+        "Installs are cached so the run stays under a couple of minutes",
+        "The workflow uses the same Node version as production"
+      ],
+      "paths": [
+        ".github/workflows/ci.yml"
+      ],
+      "learn": "Service containers in CI, and keeping the pipeline fast enough that you do not learn to ignore it."
+    },
+    {
+      "step": 52,
+      "id": "SHIP-1",
+      "title": "Serve the built SPA from Express",
+      "epicId": "SHIP",
+      "epicName": "Ship it",
+      "milestoneId": "M10",
+      "milestoneName": "Live at jchat.modularhq.app",
+      "size": "S",
+      "deps": [
+        "FND-5"
+      ],
+      "what": "In production, serve apps/web/dist as static files and add a catch-all that returns index.html for non-API paths, so client-side routes survive a refresh. The dev Vite proxy already imitates this.",
+      "criteria": [
+        "A hard refresh on a deep link returns the app, not a 404",
+        "The catch-all never swallows /api routes",
+        "Hashed assets get long cache headers and index.html gets none"
+      ],
+      "paths": [
+        "apps/server/src/index.ts",
+        "apps/web/vite.config.ts"
+      ],
+      "learn": "Single-origin deployment, which removes the CORS and cookie problems rather than solving them."
+    },
+    {
+      "step": 53,
+      "id": "SHIP-2",
+      "title": "Multi-stage Dockerfile",
+      "epicId": "SHIP",
+      "epicName": "Ship it",
+      "milestoneId": "M10",
+      "milestoneName": "Live at jchat.modularhq.app",
+      "size": "M",
+      "deps": [
+        "SHIP-1"
+      ],
+      "what": "Build the workspace with pnpm in one stage and copy only the production output into a slim runtime stage running as a non-root user.",
+      "criteria": [
+        "The final image carries no dev dependencies or source maps you did not intend",
+        "Layer order means a code change does not reinstall dependencies",
+        "The container runs as a non-root user"
+      ],
+      "paths": [
+        "Dockerfile",
+        ".dockerignore"
+      ],
+      "learn": "Image layers and build caching, and why the naive Dockerfile is enormous and slow."
+    },
+    {
+      "step": 54,
+      "id": "SHIP-3",
+      "title": "Deploy to jchat.modularhq.app",
+      "epicId": "SHIP",
+      "epicName": "Ship it",
+      "milestoneId": "M10",
+      "milestoneName": "Live at jchat.modularhq.app",
+      "size": "L",
+      "deps": [
+        "SHIP-2",
+        "OPS-4"
+      ],
+      "what": "Pick a host, provision managed Postgres, set secrets, point the subdomain, terminate TLS and confirm the WebSocket upgrade survives the proxy, which is the step that usually breaks.",
+      "criteria": [
+        "wss:// connects through the production proxy and stays open past any idle timeout",
+        "Secrets live in the platform, never in the repo",
+        "A push to main results in a deployed change with no manual steps"
+      ],
+      "paths": [
+        "README.md"
+      ],
+      "learn": "Reverse proxies and WebSocket upgrade headers, plus TLS termination in practice."
+    },
+    {
+      "step": 55,
+      "id": "SHIP-4",
+      "title": "Migrations on boot and a real readiness probe",
+      "epicId": "SHIP",
+      "epicName": "Ship it",
+      "milestoneId": "M10",
+      "milestoneName": "Live at jchat.modularhq.app",
+      "size": "M",
+      "deps": [
+        "SHIP-3"
+      ],
+      "what": "Run pending migrations at startup behind a lock so two instances cannot race, and split liveness (the process is up) from readiness (database reachable, migrations applied).",
+      "criteria": [
+        "Two instances starting together apply each migration exactly once",
+        "The platform routes traffic only after readiness passes",
+        "A failed migration stops the deploy instead of serving a broken build"
+      ],
+      "paths": [
+        "apps/server/src/db/migrate.ts",
+        "apps/server/src/routes/health.ts"
+      ],
+      "learn": "Advisory locks, and the difference between liveness and readiness that every orchestrator assumes you know."
+    }
+  ]
+}

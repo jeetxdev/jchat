@@ -1,0 +1,4 @@
+name: dev(local)
+variables:
+  - name: API_BASE_URL
+    value: http://localhost:3001/api/v1

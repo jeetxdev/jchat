@@ -1,5 +1,5 @@
 import { ChevronLeft, Phone, Video, Pin, Paperclip, Send } from "lucide-react";
-import type { Chat, Contact } from "@jchat/shared";
+import type { Chat, Contact, WallpaperId } from "@jchat/shared";
 import Avatar from "../components/primitives/Avatar";
 import IconButton from "../components/primitives/IconButton";
 import MessageBubble from "../components/primitives/MessageBubble";
@@ -8,6 +8,7 @@ import styles from "./Conversation.module.css";
 interface ConversationProps {
   chat: Chat;
   contact?: Contact;
+  wallpaperId: WallpaperId;
   showBack: boolean;
   onBack: () => void;
   onOpenInfo: () => void;
@@ -17,6 +18,7 @@ interface ConversationProps {
 export default function Conversation({
   chat,
   contact,
+  wallpaperId,
   showBack,
   onBack,
   onOpenInfo,
@@ -79,7 +81,7 @@ export default function Conversation({
         </div>
       )}
 
-      <div className={styles.messages}>
+      <div className={styles.messages} data-wallpaper={wallpaperId}>
         <div className={styles.dateChip}>TODAY</div>
         {chat.messages.map((message) => (
           <MessageBubble key={message.id} message={message} outgoing={message.authorId === "me"} />

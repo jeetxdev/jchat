@@ -1,14 +1,17 @@
-import { Lock, MessageCircle, Bell, Moon } from "lucide-react";
+import { Lock, MessageCircle, Bell, Moon, Image as ImageIcon } from "lucide-react";
 import Avatar from "../components/primitives/Avatar";
 import SectionLabel from "../components/primitives/SectionLabel";
 import styles from "./Settings.module.css";
 
+export type SettingsSection = "privacy" | "wallpaper";
+
 interface SettingsProps {
   variant: "mobile" | "sidebar";
-  activeSection: "privacy" | null;
+  activeSection: SettingsSection | null;
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onOpenPrivacy: () => void;
+  onOpenWallpaper: () => void;
 }
 
 export default function Settings({
@@ -17,6 +20,7 @@ export default function Settings({
   darkMode,
   onToggleDarkMode,
   onOpenPrivacy,
+  onOpenWallpaper,
 }: SettingsProps) {
   return (
     <div className={styles.screen}>
@@ -53,6 +57,17 @@ export default function Settings({
             <MessageCircle size={16} strokeWidth={2} />
           </div>
           <span>Chats</span>
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.row} ${variant === "sidebar" && activeSection === "wallpaper" ? styles.rowActive : ""}`}
+          onClick={onOpenWallpaper}
+        >
+          <div className={styles.rowIcon}>
+            <ImageIcon size={16} strokeWidth={2} />
+          </div>
+          <span>Chat wallpaper</span>
         </button>
 
         <button type="button" className={styles.row}>

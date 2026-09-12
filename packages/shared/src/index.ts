@@ -1,1 +1,1 @@
-export type { AvatarColor, Contact, Message, Chat } from "./types.js";
+export type { AvatarColor, Contact, Message, Chat, WallpaperId } from "./types.js";

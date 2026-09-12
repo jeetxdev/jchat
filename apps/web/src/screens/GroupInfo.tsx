@@ -10,10 +10,19 @@ interface GroupInfoProps {
   chat: Chat;
   members: Contact[];
   variant: "mobile" | "panel";
+  wallpaperLabel: string;
   onBack: () => void;
+  onOpenWallpaper: () => void;
 }
 
-export default function GroupInfo({ chat, members, variant, onBack }: GroupInfoProps) {
+export default function GroupInfo({
+  chat,
+  members,
+  variant,
+  wallpaperLabel,
+  onBack,
+  onOpenWallpaper,
+}: GroupInfoProps) {
   const avatarSize = variant === "mobile" ? 88 : 88;
   const memberCount = chat.memberCount ?? members.length;
 
@@ -63,6 +72,12 @@ export default function GroupInfo({ chat, members, variant, onBack }: GroupInfoP
         {variant === "mobile" && chat.description && (
           <p className={styles.description}>{chat.description}</p>
         )}
+
+        <button type="button" className={styles.rowButton} onClick={onOpenWallpaper}>
+          <ImageIcon size={16} strokeWidth={2} />
+          <span className={styles.rowLabel}>Chat wallpaper</span>
+          <span className={styles.rowMeta}>{wallpaperLabel} ›</span>
+        </button>
 
         <div className={styles.sectionLabel}>
           <SectionLabel variant="accent">{memberCount} members</SectionLabel>

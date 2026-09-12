@@ -1,4 +1,4 @@
-import type { Chat, Contact } from "@jchat/shared";
+import type { Chat, Contact, WallpaperId } from "@jchat/shared";
 
 export const contacts: Contact[] = [
   {
@@ -52,6 +52,7 @@ export const chats: Chat[] = [
     unread: 2,
     contactId: "maya",
     pinnedMessageId: "m4",
+    wallpaperId: "mint",
     messages: [
       {
         id: "m1",
@@ -124,4 +125,12 @@ export function getContact(id: string): Contact | undefined {
 
 export function getChat(id: string): Chat | undefined {
   return chats.find((c) => c.id === id);
+}
+
+export function getChatWallpapers(): Record<string, WallpaperId> {
+  const overrides: Record<string, WallpaperId> = {};
+  for (const chat of chats) {
+    if (chat.wallpaperId) overrides[chat.id] = chat.wallpaperId;
+  }
+  return overrides;
 }
