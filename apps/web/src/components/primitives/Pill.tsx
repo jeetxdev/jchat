@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import styles from './Pill.module.css';
+import type { ReactNode } from "react";
+import styles from "./Pill.module.css";
 
-type Variant = 'active' | 'inactive' | 'tint' | 'neutral';
+type Variant = "active" | "inactive" | "tint" | "neutral";
 
 interface PillProps {
   children: ReactNode;
@@ -9,7 +9,7 @@ interface PillProps {
   onClick?: () => void;
 }
 
-export default function Pill({ children, variant = 'inactive', onClick }: PillProps) {
+export default function Pill({ children, variant = "inactive", onClick }: PillProps) {
   const className = `${styles.pill} ${styles[variant]}`;
   if (onClick) {
     return (

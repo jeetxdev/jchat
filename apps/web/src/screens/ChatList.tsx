@@ -1,35 +1,41 @@
-import { useMemo, useState } from 'react';
-import { Search, Plus } from 'lucide-react';
-import type { Chat } from '@jchat/shared';
-import ChatRow from '../components/primitives/ChatRow';
-import Pill from '../components/primitives/Pill';
-import IconButton from '../components/primitives/IconButton';
-import styles from './ChatList.module.css';
+import { useMemo, useState } from "react";
+import { Search, Plus } from "lucide-react";
+import type { Chat } from "@jchat/shared";
+import ChatRow from "../components/primitives/ChatRow";
+import Pill from "../components/primitives/Pill";
+import IconButton from "../components/primitives/IconButton";
+import styles from "./ChatList.module.css";
 
-type Filter = 'all' | 'unread' | 'groups';
+type Filter = "all" | "unread" | "groups";
 
 interface ChatListProps {
   chats: Chat[];
   selectedChatId: string | null;
   onSelectChat: (id: string) => void;
   onOpenNewChat: () => void;
-  variant: 'mobile' | 'sidebar';
+  variant: "mobile" | "sidebar";
 }
 
-export default function ChatList({ chats, selectedChatId, onSelectChat, onOpenNewChat, variant }: ChatListProps) {
-  const [filter, setFilter] = useState<Filter>('all');
+export default function ChatList({
+  chats,
+  selectedChatId,
+  onSelectChat,
+  onOpenNewChat,
+  variant,
+}: ChatListProps) {
+  const [filter, setFilter] = useState<Filter>("all");
   const unreadCount = chats.filter((c) => c.unread).length;
 
   const visibleChats = useMemo(() => {
-    if (filter === 'unread') return chats.filter((c) => c.unread);
-    if (filter === 'groups') return chats.filter((c) => c.kind === 'group');
+    if (filter === "unread") return chats.filter((c) => c.unread);
+    if (filter === "groups") return chats.filter((c) => c.kind === "group");
     return chats;
   }, [chats, filter]);
 
   return (
     <div className={styles.screen}>
-      <div className={variant === 'mobile' ? styles.headerMobile : styles.headerSidebar}>
-        {variant === 'mobile' ? (
+      <div className={variant === "mobile" ? styles.headerMobile : styles.headerSidebar}>
+        {variant === "mobile" ? (
           <>
             <h1 className={styles.title}>Chats</h1>
             <div className={styles.headerActions}>
@@ -57,13 +63,19 @@ export default function ChatList({ chats, selectedChatId, onSelectChat, onOpenNe
       </div>
 
       <div className={styles.filters}>
-        <Pill variant={filter === 'all' ? 'active' : 'inactive'} onClick={() => setFilter('all')}>
+        <Pill variant={filter === "all" ? "active" : "inactive"} onClick={() => setFilter("all")}>
           All
         </Pill>
-        <Pill variant={filter === 'unread' ? 'active' : 'inactive'} onClick={() => setFilter('unread')}>
+        <Pill
+          variant={filter === "unread" ? "active" : "inactive"}
+          onClick={() => setFilter("unread")}
+        >
           Unread · {unreadCount}
         </Pill>
-        <Pill variant={filter === 'groups' ? 'active' : 'inactive'} onClick={() => setFilter('groups')}>
+        <Pill
+          variant={filter === "groups" ? "active" : "inactive"}
+          onClick={() => setFilter("groups")}
+        >
           Groups
         </Pill>
       </div>
@@ -73,7 +85,7 @@ export default function ChatList({ chats, selectedChatId, onSelectChat, onOpenNe
           <ChatRow
             key={chat.id}
             chat={chat}
-            active={variant === 'sidebar' && chat.id === selectedChatId}
+            active={variant === "sidebar" && chat.id === selectedChatId}
             onClick={() => onSelectChat(chat.id)}
           />
         ))}

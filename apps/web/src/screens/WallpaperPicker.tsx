@@ -1,8 +1,8 @@
-import { ChevronLeft, Check } from 'lucide-react';
-import type { WallpaperId } from '@jchat/shared';
-import IconButton from '../components/primitives/IconButton';
-import { WALLPAPERS } from '../data/wallpapers';
-import styles from './WallpaperPicker.module.css';
+import { ChevronLeft, Check } from "lucide-react";
+import type { WallpaperId } from "@jchat/shared";
+import IconButton from "../components/primitives/IconButton";
+import { WALLPAPERS } from "../data/wallpapers";
+import styles from "./WallpaperPicker.module.css";
 
 interface WallpaperPickerProps {
   title: string;
@@ -27,7 +27,13 @@ export default function WallpaperPicker({
     <div className={styles.screen}>
       <div className={styles.header}>
         {showBack && (
-          <IconButton icon={<ChevronLeft size={18} strokeWidth={2.2} />} variant="ghost" size={32} label="Back" onClick={onBack} />
+          <IconButton
+            icon={<ChevronLeft size={18} strokeWidth={2.2} />}
+            variant="ghost"
+            size={32}
+            label="Back"
+            onClick={onBack}
+          />
         )}
         <h1 className={styles.title}>{title}</h1>
       </div>
@@ -39,7 +45,7 @@ export default function WallpaperPicker({
           <button
             key={wallpaper.id}
             type="button"
-            className={`${styles.option} ${wallpaper.id === selectedId ? styles.optionSelected : ''}`}
+            className={`${styles.option} ${wallpaper.id === selectedId ? styles.optionSelected : ""}`}
             onClick={() => onSelect(wallpaper.id)}
             aria-pressed={wallpaper.id === selectedId}
           >

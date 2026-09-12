@@ -1,6 +1,6 @@
-import type { Chat } from '@jchat/shared';
-import Avatar from './Avatar';
-import styles from './ChatRow.module.css';
+import type { Chat } from "@jchat/shared";
+import Avatar from "./Avatar";
+import styles from "./ChatRow.module.css";
 
 interface ChatRowProps {
   chat: Chat;
@@ -12,7 +12,7 @@ export default function ChatRow({ chat, active, onClick }: ChatRowProps) {
   return (
     <button
       type="button"
-      className={`${styles.row} ${active ? styles.active : ''}`}
+      className={`${styles.row} ${active ? styles.active : ""}`}
       onClick={onClick}
     >
       <Avatar initials={chat.initials} color={chat.color} size={52} />
@@ -22,7 +22,9 @@ export default function ChatRow({ chat, active, onClick }: ChatRowProps) {
           <span className={styles.time}>{chat.time}</span>
         </div>
         <div className={styles.preview}>
-          {chat.previewAuthor && <strong className={styles.previewAuthor}>{chat.previewAuthor}:</strong>}{' '}
+          {chat.previewAuthor && (
+            <strong className={styles.previewAuthor}>{chat.previewAuthor}:</strong>
+          )}{" "}
           {chat.preview}
         </div>
       </div>

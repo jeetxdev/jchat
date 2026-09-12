@@ -1,6 +1,6 @@
-export type AvatarColor = 'blue' | 'amber' | 'green' | 'red';
+export type AvatarColor = "blue" | "amber" | "green" | "red";
 
-export type WallpaperId = 'plain' | 'mint' | 'sand' | 'blush' | 'slate' | 'doodle';
+export type WallpaperId = "plain" | "mint" | "sand" | "blush" | "slate" | "doodle";
 
 export interface Contact {
   id: string;
@@ -15,7 +15,7 @@ export interface Contact {
 
 export interface Message {
   id: string;
-  authorId: string | 'me';
+  authorId: string | "me";
   text?: string;
   image?: { caption: string; heartCount: number };
   time: string;
@@ -24,7 +24,7 @@ export interface Message {
 
 export interface Chat {
   id: string;
-  kind: 'dm' | 'group';
+  kind: "dm" | "group";
   name: string;
   initials: string;
   color: AvatarColor;

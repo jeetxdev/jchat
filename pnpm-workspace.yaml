@@ -1,6 +1,6 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - "apps/*"
+  - "packages/*"
 
 # pnpm blocks dependency install scripts by default; esbuild's fetches its native binary.
 allowBuilds:

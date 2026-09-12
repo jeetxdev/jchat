@@ -1,20 +1,31 @@
-import { ChevronLeft } from 'lucide-react';
-import IconButton from '../components/primitives/IconButton';
-import styles from './Privacy.module.css';
+import { ChevronLeft } from "lucide-react";
+import IconButton from "../components/primitives/IconButton";
+import styles from "./Privacy.module.css";
 
 interface PrivacyProps {
-  variant: 'mobile' | 'desktop';
+  variant: "mobile" | "desktop";
   readReceipts: boolean;
   onToggleReadReceipts: () => void;
   onBack: () => void;
 }
 
-export default function Privacy({ variant, readReceipts, onToggleReadReceipts, onBack }: PrivacyProps) {
+export default function Privacy({
+  variant,
+  readReceipts,
+  onToggleReadReceipts,
+  onBack,
+}: PrivacyProps) {
   return (
     <div className={styles.screen}>
       <div className={styles.header}>
-        {variant === 'mobile' && (
-          <IconButton icon={<ChevronLeft size={18} strokeWidth={2.2} />} variant="ghost" size={32} label="Back" onClick={onBack} />
+        {variant === "mobile" && (
+          <IconButton
+            icon={<ChevronLeft size={18} strokeWidth={2.2} />}
+            variant="ghost"
+            size={32}
+            label="Back"
+            onClick={onBack}
+          />
         )}
         <h1 className={styles.title}>Privacy</h1>
       </div>
@@ -32,7 +43,7 @@ export default function Privacy({ variant, readReceipts, onToggleReadReceipts, o
           <span>Read receipts</span>
           <button
             type="button"
-            className={`${styles.toggle} ${readReceipts ? styles.toggleOn : ''}`}
+            className={`${styles.toggle} ${readReceipts ? styles.toggleOn : ""}`}
             onClick={onToggleReadReceipts}
             aria-label="Toggle read receipts"
           >

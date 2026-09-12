@@ -6,7 +6,9 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: filter 0.15s ease, background 0.15s ease;
+  transition:
+    filter 0.15s ease,
+    background 0.15s ease;
 }
 
 .button:hover {

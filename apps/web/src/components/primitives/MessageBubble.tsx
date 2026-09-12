@@ -1,6 +1,6 @@
-import { CheckCheck, Image as ImageIcon, Heart } from 'lucide-react';
-import type { Message } from '@jchat/shared';
-import styles from './MessageBubble.module.css';
+import { CheckCheck, Image as ImageIcon, Heart } from "lucide-react";
+import type { Message } from "@jchat/shared";
+import styles from "./MessageBubble.module.css";
 
 interface MessageBubbleProps {
   message: Message;

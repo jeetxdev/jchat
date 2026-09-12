@@ -6,13 +6,13 @@
   background-position: center;
 }
 
-[data-wallpaper='mint'] {
+[data-wallpaper="mint"] {
   background-color: #e8f5ee;
   background-image: radial-gradient(circle at 1px 1px, rgba(15, 118, 88, 0.16) 1px, transparent 0);
   background-size: 18px 18px;
 }
 
-[data-wallpaper='sand'] {
+[data-wallpaper="sand"] {
   background-color: #f7f0e3;
   background-image: repeating-linear-gradient(
     45deg,
@@ -21,13 +21,14 @@
   );
 }
 
-[data-wallpaper='blush'] {
+[data-wallpaper="blush"] {
   background-color: #fbeef3;
-  background-image: radial-gradient(circle at 60% 20%, rgba(236, 132, 174, 0.22), transparent 55%),
+  background-image:
+    radial-gradient(circle at 60% 20%, rgba(236, 132, 174, 0.22), transparent 55%),
     radial-gradient(circle at 15% 80%, rgba(147, 143, 231, 0.2), transparent 50%);
 }
 
-[data-wallpaper='slate'] {
+[data-wallpaper="slate"] {
   background-color: #eaeef5;
   background-image: repeating-linear-gradient(
     0deg,
@@ -36,19 +37,20 @@
   );
 }
 
-[data-wallpaper='doodle'] {
+[data-wallpaper="doodle"] {
   background-color: #eef3fb;
-  background-image: radial-gradient(circle at 4px 4px, rgba(11, 132, 255, 0.18) 2px, transparent 0),
+  background-image:
+    radial-gradient(circle at 4px 4px, rgba(11, 132, 255, 0.18) 2px, transparent 0),
     radial-gradient(circle at 20px 20px, rgba(11, 132, 255, 0.1) 3px, transparent 0);
   background-size: 32px 32px;
 }
 
-:root[data-theme='dark'] [data-wallpaper='mint'] {
+:root[data-theme="dark"] [data-wallpaper="mint"] {
   background-color: #0d1c18;
   background-image: radial-gradient(circle at 1px 1px, rgba(94, 214, 174, 0.16) 1px, transparent 0);
 }
 
-:root[data-theme='dark'] [data-wallpaper='sand'] {
+:root[data-theme="dark"] [data-wallpaper="sand"] {
   background-color: #1d1810;
   background-image: repeating-linear-gradient(
     45deg,
@@ -57,13 +59,14 @@
   );
 }
 
-:root[data-theme='dark'] [data-wallpaper='blush'] {
+:root[data-theme="dark"] [data-wallpaper="blush"] {
   background-color: #1d1219;
-  background-image: radial-gradient(circle at 60% 20%, rgba(236, 132, 174, 0.2), transparent 55%),
+  background-image:
+    radial-gradient(circle at 60% 20%, rgba(236, 132, 174, 0.2), transparent 55%),
     radial-gradient(circle at 15% 80%, rgba(147, 143, 231, 0.18), transparent 50%);
 }
 
-:root[data-theme='dark'] [data-wallpaper='slate'] {
+:root[data-theme="dark"] [data-wallpaper="slate"] {
   background-color: #111a2a;
   background-image: repeating-linear-gradient(
     0deg,
@@ -72,8 +75,9 @@
   );
 }
 
-:root[data-theme='dark'] [data-wallpaper='doodle'] {
+:root[data-theme="dark"] [data-wallpaper="doodle"] {
   background-color: #0f1727;
-  background-image: radial-gradient(circle at 4px 4px, rgba(11, 132, 255, 0.28) 2px, transparent 0),
+  background-image:
+    radial-gradient(circle at 4px 4px, rgba(11, 132, 255, 0.28) 2px, transparent 0),
     radial-gradient(circle at 20px 20px, rgba(11, 132, 255, 0.16) 3px, transparent 0);
 }
