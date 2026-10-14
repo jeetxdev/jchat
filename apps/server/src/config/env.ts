@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 
 const DEFAULT_PORT = 3001;
 
@@ -8,6 +8,7 @@ const ENV_CONFIG = z.object({
   DATABASE_URL: z.string(),
   DATABASE_URL_POOLED: z.string(),
   JWT_SECRET: z.string(),
+  LOG_LEVEL: z.string().optional(),
 });
 const envConfig = ENV_CONFIG.safeParse(process.env);
 
