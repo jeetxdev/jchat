@@ -9,6 +9,8 @@
     "dev:web": "pnpm --filter @jchat/web dev",
     "dev:server": "pnpm --filter @jchat/server dev",
     "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

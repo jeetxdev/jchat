@@ -1,6 +1,7 @@
 import { AppError } from "../lib/AppError.js";
-import { HTTP_STATUS } from "../constants/http.js";
-import { ERROR_CODES, ERROR_MESSAGES } from "../constants/errorCodes.js";
+import { HTTP_STATUS } from "../constants/httpStatuses.js";
+import { ERROR_CODES } from "../constants/errorCodes.js";
+import { ERROR_MESSAGES } from "../constants/errorMessages.js";
 import { type ZodType, type output } from "zod";
 import type { Request, RequestHandler } from "express";
 

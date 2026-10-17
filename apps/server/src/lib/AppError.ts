@@ -1,5 +1,5 @@
 import type { ErrorCode } from "../constants/errorCodes.js";
-import type { HttpStatus } from "../constants/http.js";
+import type { HttpStatus } from "../constants/httpStatuses.js";
 
 export class AppError extends Error {
   status: HttpStatus;

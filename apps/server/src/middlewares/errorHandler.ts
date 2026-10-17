@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../lib/AppError.js";
 import { ERROR_CODES } from "../constants/errorCodes.js";
 import type { ErrorResponse } from "../types/response.js";
-import { HTTP_STATUS } from "../constants/http.js";
+import { HTTP_STATUS } from "../constants/httpStatuses.js";
 import { ENV } from "../config/env.js";
 
 const isJsonParseError = (error: unknown): boolean => {
@@ -31,7 +31,7 @@ export const errorHandler = (err: unknown, req: Request, res: Response, _next: N
   } else {
     req.log.error(err);
   }
-  if (ENV.NODE_ENV === "development") {
+  if (ENV.NODE_ENV === "development" && errorResponse.status !== HTTP_STATUS.NOT_FOUND) {
     errorResponse.stack = err instanceof Error ? err.stack : undefined;
   }
   res.status(errorResponse.status).json(errorResponse);

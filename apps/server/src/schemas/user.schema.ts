@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString, isSupportedCountry } from "libphonenumber-js";
-import { ERROR_MESSAGES } from "../constants/errorCodes.js";
+import { ERROR_MESSAGES } from "../constants/errorMessages.js";
 
 export const createUserSchema = z
   .object({
