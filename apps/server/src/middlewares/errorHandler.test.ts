@@ -8,11 +8,7 @@ import { errorHandler } from "./errorHandler.js";
 const sampleApp = () => {
   const app = express();
   app.get("/internalError", () => {
-    throw new AppError(
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      ERROR_CODES.INTERNAL_SERVER_ERROR,
-      ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-    );
+    throw new AppError(ERROR_CODES.INTERNAL_ERROR, ERROR_MESSAGES.INTERNAL_ERROR);
   });
   app.use(errorHandler);
   return app;
@@ -20,9 +16,9 @@ const sampleApp = () => {
 
 describe("Error Handler", () => {
   const app = sampleApp();
-
-  it("should return 500 for internal error", async () => {
+  it("should return 500 with INTERNAL_ERROR for internal error", async () => {
     const res = await request(app).get("/internalError");
-    expect(res.body.code).toBe(ERROR_CODES.INTERNAL_SERVER_ERROR);
+    expect(res.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(res.body.code).toBe(ERROR_CODES.INTERNAL_ERROR);
   });
 });

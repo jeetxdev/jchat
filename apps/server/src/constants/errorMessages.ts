@@ -1,7 +1,8 @@
 const ERROR_MESSAGES = {
-  NOT_FOUND: "Not Found",
-  VALIDATION_ERROR: "Validation failed",
-  INTERNAL_SERVER_ERROR: "Internal Server Error",
+  ROUTE_NOT_FOUND: "Route not found",
+  VALIDATION_FAILED: "Validation failed",
+  INVALID_JSON: "Invalid JSON body",
+  INTERNAL_ERROR: "Internal server error",
   INVALID_COUNTRY_CODE: "Invalid country code",
   INVALID_PHONE_NUMBER: "Invalid phone number",
 } as const;

@@ -1,8 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../lib/AppError.js";
-import { ERROR_CODES } from "../constants/errorCodes.js";
+import { ERROR_CODES, ERROR_MESSAGES } from "../constants/index.js";
 import type { ErrorResponse } from "../types/response.js";
-import { HTTP_STATUS } from "../constants/httpStatuses.js";
 import { ENV } from "../config/env.js";
 
 const isJsonParseError = (error: unknown): boolean => {
@@ -13,26 +12,22 @@ const isJsonParseError = (error: unknown): boolean => {
   return parseError.status === 400 && parseError.type === "entity.parse.failed";
 };
 
+const toAppError = (err: unknown): AppError => {
+  if (err instanceof AppError) return err;
+  if (isJsonParseError(err))
+    return new AppError(ERROR_CODES.INVALID_JSON, ERROR_MESSAGES.INVALID_JSON);
+  return new AppError(ERROR_CODES.INTERNAL_ERROR, ERROR_MESSAGES.INTERNAL_ERROR);
+};
+
 export const errorHandler = (err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  const errorResponse: ErrorResponse = {
-    status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-    message: "Internal server error",
-  };
-  if (isJsonParseError(err)) {
-    errorResponse.status = HTTP_STATUS.BAD_REQUEST;
-    errorResponse.code = ERROR_CODES.VALIDATION_ERROR;
-    errorResponse.message = "Invalid JSON body";
-  } else if (err instanceof AppError) {
-    errorResponse.status = err.status;
-    errorResponse.code = err.code;
-    errorResponse.message = err.message;
-    errorResponse.details = err.details;
-  } else {
+  const { status, code, message, details } = toAppError(err);
+  if (!(err instanceof AppError) && !isJsonParseError(err)) {
     req.log.error(err);
   }
-  if (ENV.NODE_ENV === "development" && errorResponse.status !== HTTP_STATUS.NOT_FOUND) {
+  const errorResponse: ErrorResponse = { status, code, message, details };
+  // Stack comes from the original error, not the wrapper AppError.
+  if (ENV.NODE_ENV === "development" && code !== ERROR_CODES.ROUTE_NOT_FOUND) {
     errorResponse.stack = err instanceof Error ? err.stack : undefined;
   }
-  res.status(errorResponse.status).json(errorResponse);
+  res.status(status).json(errorResponse);
 };
