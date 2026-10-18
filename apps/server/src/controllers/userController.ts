@@ -5,7 +5,7 @@ import type {
   UserQueryType,
 } from "../schemas/user.schema.js";
 import { sendSuccess } from "../utils/apiResponse.js";
-import { HTTP_STATUS } from "../constants/http.js";
+import { HTTP_STATUS } from "../constants/httpStatuses.js";
 
 const createUserHandler = (
   req: Request<unknown, unknown, CreateUserInputType, CreateUserQueryType>,
