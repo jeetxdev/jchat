@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../lib/AppError.js";
-import { ERROR_CODES, ERROR_MESSAGES } from "../constants/index.js";
 import type { ErrorResponse } from "../types/response.js";
 import { ENV } from "../config/env.js";
 
@@ -14,9 +13,8 @@ const isJsonParseError = (error: unknown): boolean => {
 
 const toAppError = (err: unknown): AppError => {
   if (err instanceof AppError) return err;
-  if (isJsonParseError(err))
-    return new AppError(ERROR_CODES.INVALID_JSON, ERROR_MESSAGES.INVALID_JSON);
-  return new AppError(ERROR_CODES.INTERNAL_ERROR, ERROR_MESSAGES.INTERNAL_ERROR);
+  if (isJsonParseError(err)) return new AppError("INVALID_JSON");
+  return new AppError("INTERNAL_ERROR");
 };
 
 export const errorHandler = (err: unknown, req: Request, res: Response, _next: NextFunction) => {
@@ -26,7 +24,7 @@ export const errorHandler = (err: unknown, req: Request, res: Response, _next: N
   }
   const errorResponse: ErrorResponse = { status, code, message, details };
   // Stack comes from the original error, not the wrapper AppError.
-  if (ENV.NODE_ENV === "development" && code !== ERROR_CODES.ROUTE_NOT_FOUND) {
+  if (ENV.NODE_ENV === "development" && code !== "ROUTE_NOT_FOUND") {
     errorResponse.stack = err instanceof Error ? err.stack : undefined;
   }
   res.status(status).json(errorResponse);

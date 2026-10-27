@@ -1,5 +1,4 @@
 import { AppError } from "../lib/AppError.js";
-import { ERROR_CODES, ERROR_MESSAGES } from "../constants/index.js";
 import { type ZodType, type output } from "zod";
 import type { Request, RequestHandler } from "express";
 
@@ -60,9 +59,7 @@ const validate =
       }
     }
     if (errors.length > 0) {
-      return next(
-        new AppError(ERROR_CODES.VALIDATION_FAILED, ERROR_MESSAGES.VALIDATION_FAILED, errors),
-      );
+      return next(new AppError("VALIDATION_FAILED", { details: errors }));
     }
     next();
   };

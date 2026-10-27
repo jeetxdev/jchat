@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 const DEFAULT_PORT = 3001;
+const DEFAULT_DB_POOL_MAX = 10;
 
 const ENV_CONFIG = z.object({
   PORT: z.coerce.number().default(DEFAULT_PORT),
   NODE_ENV: z.enum(["development", "production"]),
   DATABASE_URL: z.string(),
   DATABASE_URL_POOLED: z.string(),
+  DB_POOL_MAX: z.coerce.number().min(1).default(DEFAULT_DB_POOL_MAX),
   JWT_SECRET: z.string(),
   LOG_LEVEL: z.string().optional(),
 });
