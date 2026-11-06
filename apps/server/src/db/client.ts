@@ -5,8 +5,8 @@ import { logger } from "../lib/logger.js";
 export const pool = new Pool({
   connectionString: ENV.DATABASE_URL_POOLED,
   max: ENV.DB_POOL_MAX,
-  connectionTimeoutMillis: 5000,
-  idleTimeoutMillis: 5000,
+  connectionTimeoutMillis: ENV.DB_CONNECTION_TIMEOUT,
+  idleTimeoutMillis: ENV.DB_IDLE_TIMEOUT,
 });
 
 pool.on("error", (err) => {

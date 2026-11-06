@@ -5,7 +5,6 @@ type AppErrorOptions = {
   message?: string;
   details?: unknown;
 };
-
 export class AppError extends Error {
   status: HttpStatus;
   code: Errors;

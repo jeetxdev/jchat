@@ -24,7 +24,7 @@ jChat is an educational project. I am building it to learn, so your job is to gu
 
 ## Allowed without asking
 
-- Reading files, searching the codebase, and running read-only commands (`pnpm lint`, `pnpm typecheck`, `pnpm test`) to understand the current state or verify my work.
+- Reading files, searching the codebase, and running read-only commands (`npm run lint`, `npm run typecheck`, `npm run test`) to understand the current state or verify my work.
 
 ## Tone
 

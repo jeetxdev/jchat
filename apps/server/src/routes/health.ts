@@ -10,7 +10,7 @@ export const healthRouter = Router();
 healthRouter.get("/health", async (_req, res) => {
   try {
     const result = await pool.query("SELECT 1");
-    const db = result.rows[0] ? true : false;
+    const db = !!result.rows[0];
     const data = {
       uptime: process.uptime(),
       db,
