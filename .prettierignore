@@ -1,5 +1,4 @@
 node_modules
 dist
 dist-ssr
-pnpm-lock.yaml
-.pnpm-store
+package-lock.json
