@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
-import { AppError } from "../lib/AppError.js";
-import type { ErrorResponse } from "../types/response.js";
-import { ENV } from "../config/env.js";
+import { AppError } from "../lib/AppError";
+import type { ErrorResponse } from "../types/response";
+import { ENV } from "../config/env";
 
 const isJsonParseError = (error: unknown): boolean => {
   if (!(error instanceof SyntaxError)) {

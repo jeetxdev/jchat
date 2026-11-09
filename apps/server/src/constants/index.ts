@@ -1,4 +1,4 @@
-import { ERRORS } from "./errors.js";
-import { HTTP_STATUS } from "./httpStatuses.js";
+import { ERRORS } from "./errors";
+import { HTTP_STATUS } from "./httpStatuses";
 
 export { ERRORS, HTTP_STATUS };

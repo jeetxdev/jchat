@@ -1,9 +1,9 @@
 import express from "express";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { HTTP_STATUS } from "../constants/index.js";
-import { AppError } from "../lib/AppError.js";
-import { errorHandler } from "./errorHandler.js";
+import { HTTP_STATUS } from "../constants";
+import { AppError } from "../lib/AppError";
+import { errorHandler } from "./errorHandler";
 
 const sampleApp = () => {
   const app = express();

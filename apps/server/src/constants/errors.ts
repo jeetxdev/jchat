@@ -1,4 +1,4 @@
-import { HTTP_STATUS, type HttpStatus } from "./httpStatuses.js";
+import { HTTP_STATUS, type HttpStatus } from "./httpStatuses";
 
 const ERRORS = {
   ROUTE_NOT_FOUND: {

@@ -1,5 +1,5 @@
-import { ERRORS, type Errors } from "../constants/errors.js";
-import type { HttpStatus } from "../constants/httpStatuses.js";
+import { ERRORS, type Errors } from "../constants/errors";
+import type { HttpStatus } from "../constants/httpStatuses";
 
 type AppErrorOptions = {
   message?: string;

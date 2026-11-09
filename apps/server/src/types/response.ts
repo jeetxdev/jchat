@@ -1,5 +1,5 @@
-import type { Errors } from "../constants/errors.js";
-import type { HttpStatus } from "../constants/httpStatuses.js";
+import type { Errors } from "../constants/errors";
+import type { HttpStatus } from "../constants/httpStatuses";
 
 export type SuccessResponse<T> = {
   status: HttpStatus;

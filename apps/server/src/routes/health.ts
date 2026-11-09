@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { sendSuccess } from "../utils/apiResponse.js";
-import { HTTP_STATUS } from "../constants/httpStatuses.js";
-import { pool } from "../db/client.js";
-import { AppError } from "../lib/AppError.js";
-import { logger } from "../lib/logger.js";
+import { sendSuccess } from "../utils/apiResponse";
+import { HTTP_STATUS } from "../constants";
+import { pool } from "../db/client";
+import { AppError } from "../lib/AppError";
+import { logger } from "../lib/logger";
 
 export const healthRouter = Router();
 
 healthRouter.get("/health", async (_req, res) => {
   try {
     const result = await pool.query("SELECT 1");
-    const db = !!result.rows[0];
+    const db = result.rows[0]["?column?"] === 1;
     const data = {
       uptime: process.uptime(),
       db,

@@ -1,11 +1,11 @@
 import express from "express";
-import { API_BASE_PATH } from "./config/env.js";
-import { router } from "./routes/index.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
-import "./config/zod.js";
-import { logger } from "./lib/logger.js";
+import { API_BASE_PATH } from "./config/env";
+import { router } from "./routes";
+import { errorHandler } from "./middlewares/errorHandler";
+import "./config/zod";
+import { logger } from "./lib/logger";
 import { pinoHttp } from "pino-http";
-import { AppError } from "./lib/AppError.js";
+import { AppError } from "./lib/AppError";
 
 export const createApp = () => {
   const app = express();

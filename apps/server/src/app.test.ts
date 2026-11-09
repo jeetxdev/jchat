@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { createApp } from "./app.js";
+import { createApp } from "./app";
 import request from "supertest";
-import { HTTP_STATUS } from "./constants/index.js";
+import { HTTP_STATUS } from "./constants";
 
 describe("App", () => {
   const app = createApp();
