@@ -1,7 +1,7 @@
 import { createApp } from "./app";
 import { API_BASE_PATH, ENV } from "./config/env";
 import { logger } from "./lib/logger";
-import { pool } from "./db/client";
+import { pool } from "./db";
 
 const SHUTDOWN_TIMEOUT_MS = 10000;
 

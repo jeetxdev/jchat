@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { sendSuccess } from "../utils/apiResponse";
 import { HTTP_STATUS } from "../constants";
-import { pool } from "../db/client";
+import { pool } from "../db";
 import { AppError } from "../lib/AppError";
 import { logger } from "../lib/logger";
 

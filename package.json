@@ -19,7 +19,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc -b",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "npm run db:generate -w @jchat/server",
+    "db:migrate": "npm run db:migrate -w @jchat/server",
+    "db:studio": "npm run db:studio -w @jchat/server"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
