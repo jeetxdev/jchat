@@ -2,11 +2,11 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "../app";
 import { API_BASE_PATH } from "../config/env";
-import { pool } from "../db/client";
+import { pool } from "../db";
 
 const HEALTH_CHECK_PATH = `${API_BASE_PATH}/health`;
 
-vi.mock("../db/client", () => ({
+vi.mock("../db", () => ({
   pool: {
     query: vi.fn().mockResolvedValue({
       rows: [
