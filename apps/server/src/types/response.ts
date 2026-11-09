@@ -1,5 +1,5 @@
-import type { ErrorCode } from "../constants/errorCodes.js";
-import type { HttpStatus } from "../constants/httpStatuses.js";
+import type { Errors } from "../constants/errors";
+import type { HttpStatus } from "../constants/httpStatuses";
 
 export type SuccessResponse<T> = {
   status: HttpStatus;
@@ -9,7 +9,7 @@ export type SuccessResponse<T> = {
 
 export type ErrorResponse = {
   status: HttpStatus;
-  code: ErrorCode;
+  code: Errors;
   message: string;
   details?: unknown;
   stack?: unknown;

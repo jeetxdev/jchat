@@ -1,13 +1,17 @@
 import { z } from "zod";
 import { parsePhoneNumberFromString, isSupportedCountry } from "libphonenumber-js";
-import { ERROR_MESSAGES } from "../constants/errorMessages.js";
+
+const VALIDATION_MESSAGES = {
+  INVALID_COUNTRY_CODE: "Invalid country code",
+  INVALID_PHONE_NUMBER: "Invalid phone number",
+} as const;
 
 export const createUserSchema = z
   .object({
     fullName: z.string().min(3).max(50),
     email: z.email().max(100),
     countryCode: z.string().refine((value) => isSupportedCountry(value), {
-      message: ERROR_MESSAGES.INVALID_COUNTRY_CODE,
+      message: VALIDATION_MESSAGES.INVALID_COUNTRY_CODE,
     }),
     mobile: z.string(),
     age: z.coerce.number().int().min(13).max(120),
@@ -23,7 +27,7 @@ export const createUserSchema = z
     if (!phoneNumber || !phoneNumber.isValid()) {
       ctx.addIssue({
         code: "custom",
-        message: ERROR_MESSAGES.INVALID_PHONE_NUMBER,
+        message: VALIDATION_MESSAGES.INVALID_PHONE_NUMBER,
         path: ["mobile"],
       });
     }

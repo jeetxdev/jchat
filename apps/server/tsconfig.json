@@ -4,11 +4,9 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
     "lib": ["ES2023"],
     "types": ["node"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "noEmit": false
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true
   },
   "include": ["src"]
 }

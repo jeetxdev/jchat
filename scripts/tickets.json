@@ -188,7 +188,7 @@
       "deps": ["FND-2"],
       "what": "Split the Express app out of the listen call so tests can import the app directly. Add Vitest plus supertest and cover /health, a 404 and a thrown AppError.",
       "criteria": [
-        "pnpm test runs from the repo root and from apps/server",
+        "npm run test runs from the repo root and from apps/server",
         "Tests import createApp() and never open a real port",
         "Coverage reporting is wired even if the number is low at first"
       ],
@@ -560,7 +560,7 @@
       "deps": ["DB-5"],
       "what": "Port the four contacts and their chats out of the client mock into a seed script, so a fresh database gives you the same screens you already designed against.",
       "criteria": [
-        "pnpm db:seed is idempotent and safe to run twice",
+        "npm run db:seed is idempotent and safe to run twice",
         "Every seeded account shares one known development password",
         "The seed refuses to run against a non-local DATABASE_URL"
       ],
@@ -1096,7 +1096,7 @@
       "milestoneName": "Safe to leave running",
       "size": "M",
       "deps": ["OPS-3"],
-      "what": "A workflow running lint, typecheck, test and build on every push, with a Postgres service container and a pnpm store cache.",
+      "what": "A workflow running lint, typecheck, test and build on every push, with a Postgres service container and an npm cache.",
       "criteria": [
         "A failing test blocks the branch",
         "Installs are cached so the run stays under a couple of minutes",
@@ -1134,7 +1134,7 @@
       "milestoneName": "Live at jchat.modularhq.app",
       "size": "M",
       "deps": ["SHIP-1"],
-      "what": "Build the workspace with pnpm in one stage and copy only the production output into a slim runtime stage running as a non-root user.",
+      "what": "Build the workspace with npm in one stage and copy only the production output into a slim runtime stage running as a non-root user.",
       "criteria": [
         "The final image carries no dev dependencies or source maps you did not intend",
         "Layer order means a code change does not reinstall dependencies",

@@ -3,9 +3,9 @@ import type {
   CreateUserInputType,
   CreateUserQueryType,
   UserQueryType,
-} from "../schemas/user.schema.js";
-import { sendSuccess } from "../utils/apiResponse.js";
-import { HTTP_STATUS } from "../constants/httpStatuses.js";
+} from "../schemas/user.schema";
+import { sendSuccess } from "../utils/apiResponse";
+import { HTTP_STATUS } from "../constants";
 
 const createUserHandler = (
   req: Request<unknown, unknown, CreateUserInputType, CreateUserQueryType>,

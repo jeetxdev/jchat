@@ -1,5 +1,4 @@
-import { ERROR_CODES, ERROR_STATUS } from "./errorCodes.js";
-import { ERROR_MESSAGES } from "./errorMessages.js";
-import { HTTP_STATUS } from "./httpStatuses.js";
+import { ERRORS } from "./errors";
+import { HTTP_STATUS } from "./httpStatuses";
 
-export { ERROR_CODES, ERROR_MESSAGES, ERROR_STATUS, HTTP_STATUS };
+export { ERRORS, HTTP_STATUS };

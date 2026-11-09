@@ -1,13 +1,19 @@
 import { z } from "zod";
 
 const DEFAULT_PORT = 3001;
+const DEFAULT_DB_POOL_MAX = 10;
+const DB_CONNECTION_TIMEOUT_DEFAULT = 5000;
+const DB_IDLE_TIMEOUT_DEFAULT = 5000;
 
 const ENV_CONFIG = z.object({
   PORT: z.coerce.number().default(DEFAULT_PORT),
   NODE_ENV: z.enum(["development", "production"]),
-  DATABASE_URL: z.string(),
-  DATABASE_URL_POOLED: z.string(),
-  JWT_SECRET: z.string(),
+  DATABASE_URL: z.string().min(1),
+  DATABASE_URL_POOLED: z.string().min(1),
+  DB_POOL_MAX: z.coerce.number().min(1).default(DEFAULT_DB_POOL_MAX),
+  DB_CONNECTION_TIMEOUT: z.coerce.number().min(1).default(DB_CONNECTION_TIMEOUT_DEFAULT),
+  DB_IDLE_TIMEOUT: z.coerce.number().min(1).default(DB_IDLE_TIMEOUT_DEFAULT),
+  JWT_SECRET: z.string().min(1),
   LOG_LEVEL: z.string().optional(),
 });
 const envConfig = ENV_CONFIG.safeParse(process.env);
